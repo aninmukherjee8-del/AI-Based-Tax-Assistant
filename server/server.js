@@ -1,12 +1,12 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const connectDB = require("./config/db");
+import express from "express";
+import dotenv from "dotenv";
+import connectDB from "./config/db.js";
 
 dotenv.config();
 
 connectDB();
 
-const app = express();
+import app from express();
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
@@ -14,11 +14,10 @@ app.get("/", (req, res) => {
     res.send("AI Tax Assistant Backend Running");
 });
 
-const userRoutes = require("./routes/userRoutes");
+import userRoutes from "./routes/userRoutes.js";
 app.use("/api/users", userRoutes);
 
-const authRoutes =
-require("./routes/authRoutes");
+import authRoutes from "./routes/authRoutes.js";
 app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {
