@@ -80,13 +80,13 @@ export default function LandingPage() {
 
             <div className="flex items-center space-x-4">
               <a
-                href="/login"
+                href="/auth"
                 className="text-sm font-semibold text-slate-300 hover:text-white hover:scale-105 transition-all"
               >
                 Sign In
               </a>
               <a
-                href="/register"
+                href="/auth"
                 className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-slate-950 bg-linear-to-r from-emerald-400 to-green-300 hover:from-emerald-300 hover:to-green-200 rounded-xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-400/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 group"
               >
                 Get Started
@@ -123,7 +123,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start pt-4 gap-4">
               <a
-                href="/register"
+                href="/auth"
                 className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-bold text-slate-950 bg-linear-to-r from-emerald-400 to-green-300 hover:from-emerald-300 hover:to-green-200 rounded-xl shadow-xl shadow-emerald-500/15 hover:shadow-emerald-400/40 hover:-translate-y-1 transition-all duration-200 group"
               >
                 Start Smart Filing
@@ -252,7 +252,7 @@ export default function LandingPage() {
                 </div>
 
                 <a
-                  href="/register"
+                  href="/auth"
                   className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 hover:bg-slate-900 text-sm font-semibold hover:text-white text-slate-300 transition-all group/btn"
                 >
                   <span>Connect Financial Accounts</span>
@@ -380,9 +380,9 @@ export default function LandingPage() {
 
             {/* Sliders Widget */}
             <div className="p-8 bg-slate-950 border border-slate-900/60 rounded-3xl space-y-8 relative overflow-hidden shadow-2xl">
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {/* Slider 1 */}
-                <div className="space-y-3">
+                <div className="space-y-3 ">
                   <div className="flex justify-between items-center">
                     <label className="text-sm font-semibold text-slate-300">
                       Gross Yearly Income (INR)
@@ -400,7 +400,7 @@ export default function LandingPage() {
                     onChange={(e) => setIncome(Number(e.target.value))}
                     className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400/50"
                   />
-                  <div className="relative mt-2 text-sm text-slate-400">
+                  <div className="relative mt-0.1 mb-4 text-sm text-slate-400">
                     <span className="absolute left-0">3L</span>
 
                     <span
@@ -487,7 +487,7 @@ export default function LandingPage() {
                   stored records, and do not sell financial metadata to third
                   parties.
                 </p>
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4 mt-4">
                   {[
                     "End-to-End Encryption",
                     "Privacy Masking Middleware",
