@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Shield,
   Sparkles,
@@ -13,12 +13,56 @@ import {
   Lock,
   CheckCircle2,
   HelpCircle,
-  ExternalLink,
 } from "lucide-react";
+
+// Custom hook for the sequential typewriter effect
+const useTypewriter = (text, delay = 0, speed = 50) => {
+  const [displayedText, setDisplayedText] = useState("");
+
+  useEffect(() => {
+    let timeout;
+    let interval;
+
+    // Wait for the specified delay before starting to type
+    timeout = setTimeout(() => {
+      let i = 0;
+      interval = setInterval(() => {
+        if (i < text.length) {
+          // Using slice guarantees accurate rendering even in React Strict Mode
+          setDisplayedText(text.slice(0, i + 1));
+          i++;
+        } else {
+          clearInterval(interval);
+        }
+      }, speed);
+    }, delay);
+
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, [text, delay, speed]);
+
+  return displayedText;
+};
 
 export default function LandingPage() {
   const [income, setIncome] = useState(800000);
   const [deductions, setDeductions] = useState(150000);
+
+  // Typewriter timing sequence
+  // 1. First line starts at 300ms, types at 50ms per char
+  const typedHeading1 = useTypewriter("Demystify Taxes.", 300, 50);
+  
+  // 2. Second line starts after first line finishes (~1300ms)
+  const typedHeading2 = useTypewriter("Maximize Your Savings.", 1300, 50);
+  
+  // 3. Paragraph starts after both headings finish (~2600ms), types slightly faster (20ms)
+  const typedParagraph = useTypewriter(
+    "Navigate complex tax laws effortlessly. Let our AI assistant scan your financial documents, explain concepts in plain language, and tailor legal tax-saving strategies to fit your income patterns.",
+    2600,
+    20
+  );
 
   // Interactive mini tax calculator just for visualization / WOW factor!
   const calculateEstimatedTax = () => {
@@ -107,18 +151,22 @@ export default function LandingPage() {
               <span>Next-Gen Smart Tax Filing Assistant</span>
             </div>
 
-            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
-              Demystify Taxes.
+            {/* TYPED HEADING INCORPORATED HERE */}
+            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight min-h-[120px] sm:min-h-[144px]">
+              {typedHeading1}
               <br />
               <span className="bg-linear-to-r from-emerald-400 via-emerald-300 to-green-300 bg-clip-text text-transparent">
-                Maximize Your Savings.
+                {typedHeading2}
+                {/* Optional: Add a blinking cursor block here if desired */}
+                {typedHeading2.length > 0 && typedHeading2.length < 22 && (
+                  <span className="inline-block w-1 md:w-2 h-10 md:h-12 ml-1 bg-emerald-400 animate-pulse translate-y-1 md:translate-y-2"></span>
+                )}
               </span>
             </h1>
 
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Navigate complex tax laws effortlessly. Let our AI assistant scan
-              your financial documents, explain concepts in plain language, and
-              tailor legal tax-saving strategies to fit your income patterns.
+            {/* TYPED PARAGRAPH INCORPORATED HERE */}
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed min-h-[120px] lg:min-h-[85px]">
+              {typedParagraph}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start pt-4 gap-4">
