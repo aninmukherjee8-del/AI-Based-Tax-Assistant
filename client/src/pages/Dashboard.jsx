@@ -4,17 +4,11 @@ import MascotAssistant from "../components/MascotAssistant.jsx";
 import {
   LayoutDashboard,
   FileText,
-  PieChart,
+  Calculator,
+  Bot,
   Settings,
-  Bell,
-  Search,
-  UploadCloud,
-  ArrowUpRight,
-  ArrowDownRight,
-  CheckCircle2,
-  BrainCircuit,
   Sparkles,
-  Zap,
+  TrendingUp,
   ChevronRight,
   MoreVertical,
   HelpCircle,
@@ -643,6 +637,9 @@ export default function EnhancedDashboard() {
                       </div>
                     )}
                   </div>
+                  <button className="opacity-0 group-hover:opacity-100 bg-slate-800 hover:bg-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all">
+                    View Details
+                  </button>
                 </div>
 
                 {/* Right Side: AI Co-pilot & Risk Gauge (1 col) */}
