@@ -7,14 +7,15 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(express.json());
-const PORT = process.env.PORT || 3001;
 
 app.use(cors({
     origin:"http://localhost:5173",
-    credentials: "true"
+    credentials: true
     })
 );
+
+app.use(express.json());
+const PORT = process.env.PORT || 3001;
 
 app.get("/", (req, res) => {
     res.send("Server is working");

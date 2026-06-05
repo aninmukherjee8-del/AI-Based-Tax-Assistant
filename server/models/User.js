@@ -10,8 +10,14 @@ const userSchema =new mongoose.Schema({
         unique:true
     },  
     password:{
+        type:String, 
+    },
+    googleId:{
+        type:String
+    },
+    provider:{
         type:String,
-        required:true   
+        default:"local"
     }
 });
 
