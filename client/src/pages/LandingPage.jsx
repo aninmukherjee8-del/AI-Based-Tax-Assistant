@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import InteractiveNetworkBackground from "../components/InteractiveNetworkBackground.jsx";
+import MascotAssistant from "../components/MascotAssistant.jsx";
 import {
   Shield,
   Sparkles,
@@ -80,6 +82,7 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans scroll-smooth">
+      <InteractiveNetworkBackground />
       {/* Decorative Blur Backdrops with continuous subtle animation */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none animate-pulse duration-8000ms" />
       <div className="absolute bottom-[20%] right-[-10%] w-[60%] h-[60%] bg-green-500/5 rounded-full blur-[150px] pointer-events-none animate-pulse duration-10000ms" />
@@ -152,7 +155,7 @@ export default function LandingPage() {
             </div>
 
             {/* TYPED HEADING INCORPORATED HERE */}
-            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight min-h-[120px] sm:min-h-[144px]">
+            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight min-h-120px sm:min-h-144px">
               {typedHeading1}
               <br />
               <span className="bg-linear-to-r from-emerald-400 via-emerald-300 to-green-300 bg-clip-text text-transparent">
@@ -165,7 +168,7 @@ export default function LandingPage() {
             </h1>
 
             {/* TYPED PARAGRAPH INCORPORATED HERE */}
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed min-h-[120px] lg:min-h-[85px]">
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed min-h-120px lg:min-h-85px">
               {typedParagraph}
             </p>
 
@@ -613,6 +616,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      <MascotAssistant page="landing" />
     </div>
   );
 }
