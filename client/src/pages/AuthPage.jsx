@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from "@react-oauth/google";
+import { googleLogin } from "../services/authService";
+
 const Orb = ({ style }) => (
   <div style={{
     position: 'absolute',
@@ -226,22 +228,28 @@ export default function AuthPage() {
         </button> */}
 
         <GoogleLogin
-  onSuccess={(credentialResponse) => {
-    console.log("Google Login Success");
-    console.log(credentialResponse);
-  }}
-  onError={() => {
-    console.log("Login Failed");
-  }}
-/>
+          onSuccess={
+            async (credentialResponse) => {
+              try{
+                const data = await googleLogin(credentialResponse.credential);
+                if(data.success){
+                  localStorage.setItem("token", data.token);
+                  localStorage.setItem("user", JSON.stringify(data.user));
+                  navigate("/dashboard");
+                }
+              }
+              catch(error){
+                console.error(error);
+              }
+            }
+          }
+          onError={()=> {
+            console.error("Google login failed");
+          }
+          }
+        />
 
-        {/* Toggle */}
-        <p style={{ textAlign: 'center', fontSize: '14px', color: 'rgba(148,163,184,0.6)', margin: '32px 0 0' }}>
-          {isLogin ? "Don't have an account? " : 'Already have an account? '}
-          <button className="toggle-link" onClick={toggleAuthMode}>
-            {isLogin ? 'Register' : 'Sign In'}
-          </button>
-        </p>
+        
 
         {/* Fine print */}
         {!isLogin && (
