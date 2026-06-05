@@ -3,8 +3,23 @@ import mongoose from "mongoose";
 const documentSchema = new mongoose.Schema({
 
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        // type: mongoose.Schema.Types.ObjectId,
+        // ref: "User"
+        type: String,
+        required: true
+    },
+    documentType:{
+        type:String,
+        enum:[
+            "form16",
+            "salarySlip",
+            "bankStatement",
+            "rentReceipt",
+            "insurance",
+            "investmentProof",
+            "loanCertificate",
+            "other"
+        ]
     },
     originalFileName: {
         type: String,
@@ -22,6 +37,10 @@ const documentSchema = new mongoose.Schema({
     cloudinaryPublicId: {
         type: String,
         required: true
+    },
+    extractedData:{
+        type:mongoose.Schema.Types.Mixed,
+        default:{}
     },
     uploadedAt: {
         type: Date,

@@ -1,5 +1,6 @@
 import { extractText } from "../services/ocrService.js";
 import { uploadDocument } from "../services/cloudinaryService.js";
+import { extractDocument } from "../services/geminiService.js";
 import Document from "../models/Document.js";
 import { generateFileHash } from "../utils/hashFile.js";
 import fs from "fs";
@@ -16,8 +17,13 @@ export const parseDocument = async (req, res) => {
         const fileHash = generateFileHash(filePath);
 
         // Existing PDF text extraction
-        const rawText = await extractText(filePath);
-
+        // const rawText = await extractText(filePath);
+        const extractedText = JSON.parse(await extractDocument( filePath ));
+        // console.log("Extracted Text");
+        // return res.status(200).json({
+        //     success: true,
+        //     text: extractedText,
+        // })
         // Temporary userId for testing
         // Replace with req.user.id once auth is added
         const userId = "test-user";
@@ -51,7 +57,8 @@ export const parseDocument = async (req, res) => {
             cloudinaryUrl:
                 cloudinaryResult.secure_url,
             cloudinaryPublicId:
-                cloudinaryResult.public_id
+                cloudinaryResult.public_id,
+            extractedData: extractedText
         });
 
         if (fs.existsSync(filePath)) {
@@ -60,9 +67,7 @@ export const parseDocument = async (req, res) => {
 
         res.status(200).json({
             success: true,
-
-            text: rawText,
-
+            text: extractedText,
             cloudinary: {
                 url: cloudinaryResult.secure_url,
                 publicId: cloudinaryResult.public_id

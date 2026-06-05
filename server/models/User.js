@@ -18,6 +18,17 @@ const userSchema =new mongoose.Schema({
     provider:{
         type:String,
         default:"local"
+    },
+    profile:{
+        dob:Date,
+        gender:String,
+        panNumber:String,
+        aadhaarNumber:String,
+
+        employmentType:{
+            type:String,
+            enum:["salaried","self-employed","business","student","retired"]
+        }
     }
 });
 
