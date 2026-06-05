@@ -12,7 +12,6 @@ import {
   ChevronRight,
   MoreVertical,
   HelpCircle,
-  TrendingUp,
   Cpu,
   User,
   Activity,
@@ -27,7 +26,11 @@ import {
   RefreshCw,
   Trash2,
   Sliders,
-  DollarSign
+  DollarSign,
+  Bell,
+  UploadCloud,
+  Zap,
+  BrainCircuit
 } from "lucide-react";
 
 // --- Utility: Count Up / Interpolate Animation ---
