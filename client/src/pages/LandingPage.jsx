@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import InteractiveNetworkBackground from "../components/InteractiveNetworkBackground.jsx";
-import MascotAssistant from "../components/MascotAssistant.jsx";
+// import MascotAssistant from "../components/MascotAssistant.jsx";
 import {
   Shield,
   Sparkles,
@@ -126,12 +126,6 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <a
-                href="/auth"
-                className="text-sm font-semibold text-slate-300 hover:text-white hover:scale-105 transition-all"
-              >
-                Sign In
-              </a>
               <a
                 href="/auth"
                 className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-slate-950 bg-linear-to-r from-emerald-400 to-green-300 hover:from-emerald-300 hover:to-green-200 rounded-xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-400/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 group"
@@ -616,7 +610,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-      <MascotAssistant page="landing" />
     </div>
   );
 }

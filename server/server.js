@@ -30,6 +30,9 @@ app.use("/api/auth", authRoutes);
 import documentRoutes from "./routes/documentRoutes.js";
 app.use("/api/documents", documentRoutes);
 
+import verificationRoutes from "./routes/verificationRoutes.js";
+app.use("/api/verify", verificationRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
