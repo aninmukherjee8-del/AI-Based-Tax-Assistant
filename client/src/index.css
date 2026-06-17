@@ -115,3 +115,62 @@ code {
 html {
   scroll-behavior: smooth;
 }
+
+/* Custom Micro-Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: float 4.5s ease-in-out infinite;
+}
+
+@keyframes laserScan {
+  0% { top: 0%; opacity: 0.2; }
+  50% { top: 100%; opacity: 0.9; }
+  100% { top: 0%; opacity: 0.2; }
+}
+.animate-laser-scan {
+  position: absolute;
+  animation: laserScan 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseSafe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+.animate-pulse-safe {
+  animation: pulseSafe 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulseWarning {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+}
+.animate-pulse-warning {
+  animation: pulseWarning 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulseDanger {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+.animate-pulse-danger {
+  animation: pulseDanger 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes bubbleFadeIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-bubble-fade-in {
+  animation: bubbleFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes waveArm {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(20deg); }
+}
+.animate-wave-arm {
+  animation: waveArm 1.5s ease-in-out infinite;
+}
