@@ -19,16 +19,65 @@ const userSchema =new mongoose.Schema({
         type:String,
         default:"local"
     },
-    profile:{
-        dob:Date,
-        gender:String,
-        panNumber:String,
-        aadhaarNumber:String,
+    profile: {
+        dob: Date,
+        gender: String,
 
-        employmentType:{
-            type:String,
-            enum:["salaried","self-employed","business","student","retired"]
-        }
+        panNumber: String,
+        panVerified: {
+            type: Boolean,
+            default: false
+        },
+
+        aadhaarNumber: String,
+        aadhaarVerified: {
+            type: Boolean,
+            default: false
+        },
+
+        taxpayerClassification: {
+            type: String,
+            enum: [
+                "individual",
+                "huf",
+                "company",
+                "firm",
+                "local_authority",
+                "ajp"
+            ],
+            default: "individual"
+        },
+
+        residentialStatus: {
+            type: String,
+            enum: [
+                "resident",
+                "resident_not_ordinary",
+                "non_resident"
+            ],
+            default: "resident"
+        },
+
+        taxRegime: {
+            type: String,
+            enum: ["old", "new"],
+            default: "new"
+        },
+
+        employmentType: {
+            type: String,
+            enum: [
+                "salaried",
+                "self-employed",
+                "business",
+                "student",
+                "retired"
+            ]
+        },
+
+        incomeSources: [{
+            type: String
+        }]
     }
 });
 

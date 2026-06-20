@@ -26,7 +26,7 @@ export const parseDocument = async (req, res) => {
         // })
         // Temporary userId for testing
         // Replace with req.user.id once auth is added
-        const userId = "test-user";
+        const userId = req.user.id;
         const existingDocument =
             await Document.findOne({
                 userId,

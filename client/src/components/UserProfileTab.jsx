@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   AlertCircle,
+  LogOut, // Added LogOut icon
 } from "lucide-react";
 import api from "../services/api.js";
 
@@ -88,6 +89,12 @@ export default function UserProfileTab({
     });
   };
 
+  // Default fallback logout function if prop is not passed
+  const handleLogoutClick = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
 
   // ── Profile Save ──
   const handleProfileSave = (e) => {
@@ -168,6 +175,16 @@ export default function UserProfileTab({
             <span className="text-slate-200 font-bold font-mono">{4 + customFiles.length} files</span>
           </div>
         </div>
+
+        {/* ── Logout Button ── */}
+        <button
+          type="button"
+          onClick={handleLogoutClick}
+          className="w-full mt-6 px-4 py-2.5 rounded-xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 text-red-400 font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Sign Out</span>
+        </button>
       </div>
 
       {/* ═══════ Profile Edit Form ═══════ */}
@@ -187,7 +204,7 @@ export default function UserProfileTab({
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}
                 required
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-800 focus:border-emerald-500 text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none"
+                className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none"
               />
             </div>
             <div className="space-y-1.5">
@@ -197,7 +214,7 @@ export default function UserProfileTab({
                 value={profileEmail}
                 onChange={(e) => setProfileEmail(e.target.value)}
                 required
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-800 focus:border-emerald-500 text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none"
+                className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none"
               />
             </div>
           </div>
@@ -222,7 +239,7 @@ export default function UserProfileTab({
                   className={`flex-1 bg-slate-950 border text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none transition-colors ${
                     phoneVerified
                       ? "border-emerald-500/40 hover:border-emerald-500/60"
-                      : "border-slate-850 hover:border-slate-800 focus:border-emerald-500"
+                      : "border-slate-850 focus:border-emerald-500"
                   }`}
                 />
                 {!phoneVerified && (
@@ -270,7 +287,7 @@ export default function UserProfileTab({
                     ? isPanValid
                       ? "border-emerald-500/40 hover:border-emerald-500/60 focus:border-emerald-500"
                       : "border-red-500/40 hover:border-red-500/60 focus:border-red-500"
-                    : "border-slate-850 hover:border-slate-800 focus:border-emerald-500"
+                    : "border-slate-850 focus:border-emerald-500"
                 }`}
               />
               {panTouched && profilePan.length > 0 && !isPanValid && (
@@ -289,13 +306,14 @@ export default function UserProfileTab({
               <select 
                 value={taxpayerCategory}
                 onChange={(e) => setTaxpayerCategory(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-800 focus:border-emerald-500 text-xs text-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none"
+                className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none"
               >
-                <option>Individual / Resident</option>
-                <option>Senior Citizen (Age 60-80)</option>
-                <option>Super Senior Citizen (Age 80+)</option>
-                <option>HUF (Hindu Undivided Family)</option>
-                <option>Non-Resident Individual (NRI)</option>
+                <option>Individual</option>
+                <option>HUF(Hindu Undivided Family)</option>
+                <option>Company</option>
+                <option>Partnership Firm</option>
+                <option>Local Authorities</option>
+                <option>AJP(Artificial Juridical Persons)</option>
               </select>
             </div>
             <div className="space-y-1.5">
@@ -303,7 +321,7 @@ export default function UserProfileTab({
               <select 
                 value={employmentType}
                 onChange={(e) => setEmploymentType(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-850 hover:border-slate-800 focus:border-emerald-500 text-xs text-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none"
+                className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none"
               >
                 <option>Salaried / Employed</option>
                 <option>Self-Employed Professional</option>
@@ -320,7 +338,7 @@ export default function UserProfileTab({
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               rows={2}
-              className="w-full bg-slate-950 border border-slate-850 hover:border-slate-800 focus:border-emerald-500 text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none resize-none"
+              className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-white rounded-xl px-3.5 py-2.5 focus:outline-none resize-none"
             />
           </div>
 

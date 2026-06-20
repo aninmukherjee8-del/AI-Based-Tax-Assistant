@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Lock, UploadCloud, Activity, Check, FileCheck2, FileText, Trash2 } from "lucide-react";
+import api from "../services/api.js";
 
 export default function SecureVaultTab({
   setGrossIncome,

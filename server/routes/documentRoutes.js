@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { parseDocument } from "../controllers/documentController.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ const upload = multer({ storage });
 
 router.post(
     "/parse",
+    protect,
     upload.single("document"),
     parseDocument
 );
