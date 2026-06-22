@@ -34,6 +34,10 @@ export default function UserProfileTab({
   const [panTouched, setPanTouched] = useState(false);
   const isPanValid = PAN_REGEX.test(profilePan);
 
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
   // MSG91 Widget Script Injection
   useEffect(() => {
     const script = document.createElement("script");
@@ -49,6 +53,60 @@ export default function UserProfileTab({
   useEffect(() => {
     setPhoneVerified(false);
   }, [profilePhone]);
+
+  const loadProfile = async () => {
+    try {
+        const response = await api.get("/users/profile");
+        const user = response.data.user;
+        setProfileName(user.name || "");
+        setProfileEmail(user.email || "");
+        setProfilePhone(
+            user.profile?.phoneNumber || ""
+        );
+        setProfilePan(
+            user.profile?.panNumber || ""
+        );
+        setAddress(
+            user.profile?.address || ""
+        );
+        const taxpayerReverseMap = {
+            individual: "Individual",
+            huf: "HUF(Hindu Undivided Family)",
+            company: "Company",
+            firm: "Partnership Firm",
+            local_authority: "Local Authorities",
+            ajp: "AJP(Artificial Juridical Persons)"
+        };
+        const employmentReverseMap = {
+            salaried: "Salaried / Employed",
+            "self-employed":
+                "Self-Employed Professional",
+            business:
+                "Business Owner / Merchant",
+            retired:
+                "Retired Pensioner",
+            student:
+                "Student"
+        };
+        setTaxpayerCategory(
+            taxpayerReverseMap[
+                user.profile?.taxpayerClassification
+            ] || "Individual"
+        );
+        setEmploymentType(
+            employmentReverseMap[
+                user.profile?.employmentType
+            ] || "Salaried / Employed"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load profile:",
+            error
+        );
+    }
+  };
 
   // Format phone for API: strip spaces
   const cleanPhone = (phone) => phone.replace(/\s+/g, "");
@@ -97,25 +155,49 @@ export default function UserProfileTab({
   };
 
   // ── Profile Save ──
-  const handleProfileSave = (e) => {
+  const handleProfileSave = async (e) => {
     e.preventDefault();
+    try {
+        setIsSavingProfile(true);
+        const taxpayerMap = {
+          "Individual": "individual",
+          "HUF(Hindu Undivided Family)": "huf",
+          "Company": "company",
+          "Partnership Firm": "firm",
+          "Local Authorities": "local_authority",
+          "AJP(Artificial Juridical Persons)": "ajp"
+        };
+        const employmentMap = {
+          "Salaried / Employed": "salaried",
+          "Self-Employed Professional": "self-employed",
+          "Business Owner / Merchant": "business",
+          "Retired Pensioner": "retired"
+        };
+        await api.put("/users/profile", {
+            name: profileName,
+            email: profileEmail,
+            phoneNumber: profilePhone,
+            panNumber: profilePan,
+            taxpayerClassification: taxpayerMap[taxpayerCategory],
+            employmentType: employmentMap[employmentType],
+            address
+        });
 
-    // Block save if PAN is invalid
-    if (!isPanValid) {
-      setPanTouched(true);
-      return;
+        setShowSaveToast(true);
+
+        setTimeout(() => {
+            setShowSaveToast(false);
+        }, 3000);
+
+    } catch (error) {
+        console.error(error);
+        alert(
+            error.response?.data?.message ||
+            "Failed to save profile"
+        );
+    } finally {
+        setIsSavingProfile(false);
     }
-    if (!phoneVerified) {
-      alert("Please verify your phone number");
-      return;
-    }
-    setIsSavingProfile(true);
-    setTimeout(() => {
-      setIsSavingProfile(false);
-      setShowSaveToast(true);
-      localStorage.setItem("user", JSON.stringify({ name: profileName, email: profileEmail }));
-      setTimeout(() => setShowSaveToast(false), 3000);
-    }, 1200);
   };
 
   return (
@@ -198,7 +280,7 @@ export default function UserProfileTab({
           {/* Name + Email row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-bold">Full Name</label>
+              <label className="text-slate-300 block mb-1 font-bold">Full Name</label>
               <input 
                 type="text" 
                 value={profileName}
@@ -208,7 +290,7 @@ export default function UserProfileTab({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-bold">Email Address</label>
+              <label className="text-slate-300 block mb-1 font-bold">Email Address</label>
               <input 
                 type="email" 
                 value={profileEmail}
@@ -222,7 +304,7 @@ export default function UserProfileTab({
           {/* ═══════ Phone Number + Verification ═══════ */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-bold flex items-center gap-2">
+              <label className="text-slate-300 block mb-1 font-bold  gap-2">
                 Phone Number
                 {phoneVerified && (
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[9px] font-bold border border-emerald-500/20">
@@ -258,7 +340,7 @@ export default function UserProfileTab({
 
             {/* ═══════ PAN Number + Regex Validation ═══════ */}
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-bold flex items-center gap-2">
+              <label className="text-slate-300 block mb-1 font-bold mb gap-2">
                 Permanent Account Number (PAN)
                 {panTouched && profilePan.length > 0 && (
                   isPanValid ? (
@@ -302,11 +384,11 @@ export default function UserProfileTab({
           {/* Taxpayer Category + Employment Type */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-bold">Taxpayer Category</label>
+              <label className="text-slate-300 block mb-1 font-bold">Taxpayer Category</label>
               <select 
                 value={taxpayerCategory}
                 onChange={(e) => setTaxpayerCategory(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none"
+                className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-slate-100 rounded-xl px-3.5 py-2.5 focus:outline-none"
               >
                 <option>Individual</option>
                 <option>HUF(Hindu Undivided Family)</option>
@@ -317,11 +399,11 @@ export default function UserProfileTab({
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-slate-300 font-bold">Employment Type</label>
+              <label className="text-slate-300 block mb-1 font-bold">Employment Type</label>
               <select 
                 value={employmentType}
                 onChange={(e) => setEmploymentType(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-slate-300 rounded-xl px-3.5 py-2.5 focus:outline-none"
+                className="w-full bg-slate-950 border border-slate-850 focus:border-emerald-500 text-xs text-slate-100 rounded-xl px-3.5 py-2.5 focus:outline-none"
               >
                 <option>Salaried / Employed</option>
                 <option>Self-Employed Professional</option>
@@ -333,7 +415,7 @@ export default function UserProfileTab({
 
           {/* Address */}
           <div className="space-y-1.5">
-            <label className="text-slate-300 font-bold">Filing Address</label>
+            <label className="text-slate-300 block mb-1 font-bold">Filing Address</label>
             <textarea 
               value={address}
               onChange={(e) => setAddress(e.target.value)}

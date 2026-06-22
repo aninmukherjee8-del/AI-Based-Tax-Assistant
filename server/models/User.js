@@ -22,7 +22,8 @@ const userSchema =new mongoose.Schema({
     profile: {
         dob: Date,
         gender: String,
-
+        phoneNumber: String,
+        address: String,
         panNumber: String,
         panVerified: {
             type: Boolean,
