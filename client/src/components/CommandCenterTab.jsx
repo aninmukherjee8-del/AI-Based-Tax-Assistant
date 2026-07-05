@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "../services/api.js";
 import {
   FileText,
   Sliders,
@@ -75,12 +76,7 @@ export default function CommandCenterTab({
   deduction80D, setDeduction80D,
   deductionNps, setDeductionNps,
   deductionHra, setDeductionHra,
-  uploadState, setUploadState,
-  uploadedFile, setUploadedFile,
-  scanProgress, setScanProgress,
-  scanStep, setScanStep,
-  customFiles, setCustomFiles,
-  progress, setProgress
+ 
 }) {
   const [isAiRecalculating, setIsAiRecalculating] = useState(false);
 
@@ -180,76 +176,103 @@ export default function CommandCenterTab({
   };
   const riskInfo = getRiskDetails(auditRiskScore);
 
+  const DEFAULT_DASHBOARD = {
+    grossIncome: 1250000,
+    deduction80C: 105000,
+    deduction80D: 15000,
+    deductionNps: 0,
+    deductionHra: 50000,
+  };
+
+  const applyDashboardValues = (dashboard) => {
+    setGrossIncome(dashboard.grossIncome ?? DEFAULT_DASHBOARD.grossIncome);
+    setDeduction80C(dashboard.deduction80C ?? DEFAULT_DASHBOARD.deduction80C);
+    setDeduction80D(dashboard.deduction80D ?? DEFAULT_DASHBOARD.deduction80D);
+    setDeductionNps(dashboard.npsContribution ?? DEFAULT_DASHBOARD.deductionNps);
+    setDeductionHra(dashboard.hraExemption ?? DEFAULT_DASHBOARD.deductionHra);
+  };
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await api.get("/documents");
+      const documents = response.data.documents ?? [];
+      if (documents.length === 0) {
+        applyDashboardValues(DEFAULT_DASHBOARD);
+        return;
+      }
+      applyDashboardValues(response.data.dashboard ?? DEFAULT_DASHBOARD);
+    } catch (err) {
+      console.error(err);
+      applyDashboardValues(DEFAULT_DASHBOARD);
+    }
+  };
+
   // SVG Gauge Needle angle
   const riskAngle = 180 - (auditRiskScore / 100) * 180;
   const needleRad = (riskAngle * Math.PI) / 180;
   const needleX = 50 + 32 * Math.cos(needleRad);
   const needleY = 50 - 32 * Math.sin(needleRad);
 
-  const sampleProfiles = [
-    { name: "Form_16_TechCorp_John.pdf", gross: 1450000, c80: 150000, d80: 25000, nps: 20000, hra: 85000, size: "1.4 MB" },
-    { name: "Form_16_AeroGlobal_Sarah.pdf", gross: 1950000, c80: 150000, d80: 45000, nps: 50000, hra: 120000, size: "2.1 MB" },
-    { name: "SalarySlip_Q4_FinTech.pdf", gross: 920000, c80: 80000, d80: 10000, nps: 0, hra: 30000, size: "680 KB" }
-  ];
+  
 
-  const triggerUploadSimulation = (profile) => {
-    setUploadState("scanning");
-    setScanProgress(0);
-    setScanStep(0);
-    setUploadedFile(profile.name);
+  // const triggerUploadSimulation = (profile) => {
+  //   setUploadState("scanning");
+  //   setScanProgress(0);
+  //   setScanStep(0);
+  //   setUploadedFile(profile.name);
 
-    const stepInterval = setInterval(() => {
-      setScanStep((prev) => (prev >= 3 ? 3 : prev + 1));
-    }, 1000);
+  //   const stepInterval = setInterval(() => {
+  //     setScanStep((prev) => (prev >= 3 ? 3 : prev + 1));
+  //   }, 1000);
 
-    const progressInterval = setInterval(() => {
-      setScanProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 200);
+  //   const progressInterval = setInterval(() => {
+  //     setScanProgress((prev) => {
+  //       if (prev >= 100) {
+  //         clearInterval(progressInterval);
+  //         return 100;
+  //       }
+  //       return prev + 5;
+  //     });
+  //   }, 200);
 
-    setTimeout(() => {
-      clearInterval(stepInterval);
-      clearInterval(progressInterval);
-      setUploadState("complete");
-      setGrossIncome(profile.gross);
-      setDeduction80C(profile.c80);
-      setDeduction80D(profile.d80);
-      setDeductionNps(profile.nps);
-      setDeductionHra(profile.hra);
-      setProgress(95);
+  //   setTimeout(() => {
+  //     clearInterval(stepInterval);
+  //     clearInterval(progressInterval);
+  //     setUploadState("complete");
+  //     setGrossIncome(profile.gross);
+  //     setDeduction80C(profile.c80);
+  //     setDeduction80D(profile.d80);
+  //     setDeductionNps(profile.nps);
+  //     setDeductionHra(profile.hra);
+  //     setProgress(95);
 
-      const newFile = {
-        name: profile.name,
-        type: profile.name.includes("Form_16") ? "Form 16" : "Salary Slip",
-        date: new Date().toLocaleDateString(),
-        size: profile.size,
-        status: "Parsed & Active"
-      };
-      setCustomFiles((prev) => [newFile, ...prev]);
-    }, 4000);
-  };
+  //     const newFile = {
+  //       name: profile.name,
+  //       type: profile.name.includes("Form_16") ? "Form 16" : "Salary Slip",
+  //       date: new Date().toLocaleDateString(),
+  //       size: profile.size,
+  //       status: "Parsed & Active"
+  //     };
+  //     setCustomFiles((prev) => [newFile, ...prev]);
+  //   }, 4000);
+  // };
 
-  const resetUpload = () => {
-    setUploadState("idle");
-    setUploadedFile(null);
-    setScanProgress(0);
-    setScanStep(0);
-    setProgress(68);
-  };
+  // const resetUpload = () => {
+  //   setUploadState("idle");
+  //   setUploadedFile(null);
+  //   setScanProgress(0);
+  //   setScanStep(0);
+  //   setProgress(68);
+  // };
 
   const animatedIncome = useCountUp(grossIncome);
   const animatedTax = useCountUp(finalTax);
   const animatedDeductions = useCountUp(totalDeductions);
-
+  // const progress = 100;
   const circleRadius = 28;
   const circleCircumference = 2 * Math.PI * circleRadius;
+  const progress = grossIncome > 0 ? 100 : 0;
   const strokeOffset = circleCircumference - (progress / 100) * circleCircumference;
-
   return (
     <div className="space-y-6">
       
@@ -318,8 +341,8 @@ export default function CommandCenterTab({
           </div>
           <div className="mt-4 pt-2.5 border-t border-slate-900/60 flex justify-between items-center">
             <span className="text-xs text-slate-500">Form 16 Status:</span>
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${uploadedFile ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
-              {uploadedFile ? "ACTIVE" : "PENDING UPLOAD"}
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${grossIncome > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
+              { grossIncome > 0? "ACTIVE" : "PENDING UPLOAD"}
             </span>
           </div>
         </div>
@@ -340,6 +363,7 @@ export default function CommandCenterTab({
               </div>
               <div className="flex items-center gap-2">
                 <button 
+                
                   onClick={() => {
                     setDeduction80C(150000);
                     setDeduction80D(50000);
@@ -351,13 +375,7 @@ export default function CommandCenterTab({
                   Maximize Limit
                 </button>
                 <button 
-                  onClick={() => {
-                    setGrossIncome(1250000);
-                    setDeduction80C(105000);
-                    setDeduction80D(15000);
-                    setDeductionNps(0);
-                    setDeductionHra(50000);
-                  }}
+                  onClick={fetchDashboardData}
                   className="text-[10px] font-bold text-slate-400 hover:text-emerald-400 flex items-center space-x-1 transition-colors bg-slate-900/40 hover:bg-slate-900/80 border border-slate-800 px-2.5 py-1.5 rounded-lg cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
@@ -545,7 +563,7 @@ export default function CommandCenterTab({
           </div>
 
           {/* Form 16 OCR Parser Simulator widget */}
-          <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl relative overflow-hidden">
+          {/* <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl relative overflow-hidden">
             <h3 className="text-base font-bold text-white mb-1 flex items-center space-x-2">
               <FileText className="w-5 h-5 text-emerald-400" />
               <span>Form 16 OCR Parser Simulator</span>
@@ -635,10 +653,10 @@ export default function CommandCenterTab({
               </div>
             )}
           </div>
-        </div>
+        </div> */}
 
         {/* Right Columns (AI Copilot suggestion drawer, risk levels) */}
-        <div className="space-y-6">
+        {/* <div className="space-y-6"> */}
           
           {/* AI Copilot Suggestions */}
           <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl flex flex-col items-center text-center relative overflow-hidden group">

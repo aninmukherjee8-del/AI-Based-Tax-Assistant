@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { parseDocument } from "../controllers/documentController.js";
+import { parseDocument,getUserDocuments} from "../controllers/documentController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -22,6 +22,11 @@ router.post(
     protect,
     upload.single("document"),
     parseDocument
+);
+router.get(
+    "/",
+    protect,
+    getUserDocuments
 );
 
 export default router;

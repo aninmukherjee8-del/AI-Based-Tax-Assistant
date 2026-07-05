@@ -66,6 +66,7 @@ export const parseDocument = async (req, res) => {
             originalFileName:
                 req.file.originalname,
             fileHash,
+            fileSize: req.file.size,
             cloudinaryUrl:
                 cloudinaryResult.secure_url,
             cloudinaryPublicId:
@@ -93,6 +94,77 @@ export const parseDocument = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Failed to parse document"
+        });
+
+    }
+
+        
+};
+
+export const getUserDocuments = async (req, res) => {
+    try {
+
+        const documents = await Document.find({
+            userId: req.user.id
+        }).sort({ createdAt: -1 });
+
+        let grossIncome = 0;
+
+        let deduction80C = 0;
+        let deduction80D = 0;
+
+        let npsContribution = 0;
+        let hraExemption = 0;
+
+        let tds = 0;
+        documents.forEach((doc) => {
+            const tax = doc.extractedData?.taxProfile;
+
+                if (!tax) return;
+                grossIncome = Math.max(
+                grossIncome,
+                tax.grossIncome || 0);
+                deduction80C += tax.deduction80C || 0;
+
+                deduction80D += tax.deduction80D || 0;
+
+                npsContribution += tax.npsContribution || 0;
+
+                hraExemption += tax.hraExemption || 0;
+
+                tds += tax.tds || 0;
+
+});
+    res.status(200).json({
+    success: true,
+
+    documents,
+
+    dashboard: {
+
+        grossIncome,
+
+        deduction80C,
+
+        deduction80D,
+
+        npsContribution,
+
+        hraExemption,
+
+        tds
+
+    }
+
+});
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch documents"
         });
 
     }
