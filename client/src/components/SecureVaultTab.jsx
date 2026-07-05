@@ -36,7 +36,7 @@ export default function SecureVaultTab({
         }
         return prev + 5;
       });
-    }, 170);
+    }, 50);
 
     setTimeout(() => {
       clearInterval(stepInterval);
@@ -59,9 +59,59 @@ export default function SecureVaultTab({
     }, 3400);
   };
 
-  const handleVaultFileSelect = (e) => {
+  const handleVaultFileSelect = async(e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const formData =
+    new FormData();
+
+    formData.append(
+      "document",
+      file
+    );
+    const response =
+    await api.post(
+    "/documents/parse",
+    formData,
+    {
+      headers:{
+        "Content-Type":
+        "multipart/form-data"
+      }
+    }
+    );
+
+    console.log(response.data);
+    const extracted =
+response.data.text?.taxProfile;
+
+if (!extracted) {
+   console.error(
+      "No tax profile returned"
+   );
+   return;
+}
+    
+    if(extracted.grossIncome!=null){
+   setGrossIncome(extracted.grossIncome);
+}
+
+if(extracted.deduction80C!=null){
+   setDeduction80C(extracted.deduction80C);
+}
+
+if(extracted.deduction80D!=null){
+   setDeduction80D(extracted.deduction80D);
+}
+
+if(extracted.npsContribution!=null){
+   setDeductionNps(extracted.npsContribution);
+}
+
+if(extracted.hraExemption!=null){
+   setDeductionHra(extracted.hraExemption);
+}
+
 
     const mockProfile = {
       name: file.name,

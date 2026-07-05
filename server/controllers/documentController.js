@@ -18,7 +18,19 @@ export const parseDocument = async (req, res) => {
 
         // Existing PDF text extraction
         // const rawText = await extractText(filePath);
-        const extractedText = JSON.parse(await extractDocument( filePath ));
+        let rawResponse =
+        await extractDocument(filePath);
+
+        console.log("RAW GEMINI RESPONSE:");
+        console.log(rawResponse);
+
+        rawResponse = rawResponse
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+        const extractedText =
+        JSON.parse(rawResponse);
         // console.log("Extracted Text");
         // return res.status(200).json({
         //     success: true,

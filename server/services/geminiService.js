@@ -22,14 +22,57 @@ export const extractDocument = async (filePath) => {
         throw new Error("Gemini processing failed");
     }
 
-    const content = [
-        `
-            Extract all text from this document.
-            Preserve headings, tables, values, names, PAN numbers, and account numbers.
-            Return ONLY valid JSON. Do not use markdown. Do not use backticks.
-            Do not add explanations or any conversational text.
-        `,
-    ];
+   const content = [`
+You are a tax document parser.
+
+Identify the document type.
+
+Possible document types:
+- form16
+- payslip
+- insurance_receipt
+- rent_receipt
+- elss_statement
+- nps_statement
+- bank_statement
+- investment_proof
+- other
+
+Return ONLY valid JSON.
+
+Use this exact schema:
+{
+  "documentType": "",
+
+  "taxProfile": {
+    "grossIncome": null,
+    "deduction80C": null,
+    "deduction80D": null,
+    "npsContribution": null,
+    "hraExemption": null,
+    "tds": null
+  },
+
+  "documentData": {},
+
+  "summary": ""
+}
+
+Rules:
+- Missing values must be null.
+- Monetary values must be numbers only.
+- Do not include currency symbols.
+- Do not include commas.
+- Return valid JSON only.
+- Do NOT wrap the response in markdown.
+- Do NOT use markdown code fences.
+- Return raw JSON only.
+- The first character of the response must be {
+- The last character of the response must be }
+`
+
+];
+
     if (currentFile.uri && currentFile.mimeType) {
         const currentFileContent = createPartFromUri(
             currentFile.uri,
