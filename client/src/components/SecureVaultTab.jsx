@@ -1,6 +1,27 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Lock, UploadCloud, Activity, Check, FileCheck2, FileText, Trash2 } from "lucide-react";
 import api from "../services/api.js";
+
+const formatVaultDate = (doc) => {
+  const date = new Date(doc.createdAt || doc.uploadedAt);
+  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+};
+
+const formatVaultFileSize = (doc) => {
+  const bytes = doc.fileSize ?? doc.filesize;
+  if (!bytes) return "-";
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+};
+
+const formatDocumentType = (doc) => {
+  const type = doc.documentType || doc.extractedData?.documentType;
+  if (!type) return "Other";
+  return type
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (c) => c.toUpperCase())
+    .trim();
+};
 
 export default function SecureVaultTab({
   setGrossIncome,
@@ -8,15 +29,40 @@ export default function SecureVaultTab({
   setDeduction80D,
   setDeductionNps,
   setDeductionHra,
-  customFiles,
-  setCustomFiles,
   setActiveTab
 }) {
   const [vaultUploadState, setVaultUploadState] = useState("idle");
   const [vaultUploadedFile, setVaultUploadedFile] = useState(null);
   const [vaultScanProgress, setVaultScanProgress] = useState(0);
   const [vaultScanStep, setVaultScanStep] = useState(0);
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const fetchDocuments = async () => {
+  try {
+
+    setLoading(true);
+
+    const response = await api.get("/documents");
+
+    setDocuments(response.data.documents);
+
+  } catch (err) {
+
+    console.error(err);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
+
+  useEffect(() => {
+
+    fetchDocuments();
+
+}, []);
 
   const triggerVaultUploadSimulation = (profile) => {
     setVaultUploadState("scanning");
@@ -48,14 +94,6 @@ export default function SecureVaultTab({
       setDeductionNps(profile.nps);
       setDeductionHra(profile.hra);
 
-      const newFile = {
-        name: profile.name,
-        type: profile.name.includes("Form_16") ? "Form 16" : profile.name.includes("Salary") ? "Salary Slip" : "Investment Proof",
-        date: new Date().toLocaleDateString(),
-        size: profile.size,
-        status: "Parsed & Active"
-      };
-      setCustomFiles((prev) => [newFile, ...prev]);
     }, 3400);
   };
 
@@ -111,19 +149,20 @@ if(extracted.npsContribution!=null){
 if(extracted.hraExemption!=null){
    setDeductionHra(extracted.hraExemption);
 }
+ await fetchDocuments();
 
+triggerVaultUploadSimulation({
+    name: file.name,
+    gross: extracted.grossIncome ?? 0,
+    c80: extracted.deduction80C ?? 0,
+    d80: extracted.deduction80D ?? 0,
+    nps: extracted.npsContribution ?? 0,
+    hra: extracted.hraExemption ?? 0,
+    size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+});
 
-    const mockProfile = {
-      name: file.name,
-      gross: Math.floor(Math.random() * 1200000) + 800000,
-      c80: Math.floor(Math.random() * 50000) + 100000,
-      d80: Math.floor(Math.random() * 20000) + 15000,
-      nps: Math.floor(Math.random() * 30000) + 20000,
-      hra: Math.floor(Math.random() * 50000) + 50000,
-      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
-    };
-
-    triggerVaultUploadSimulation(mockProfile);
+   
+    
   };
 
   return (
@@ -236,7 +275,7 @@ if(extracted.hraExemption!=null){
 
       {/* Files Index Table */}
       <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl">
-        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4">Vault Files ({4 + customFiles.length})</h3>
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4">Vault Files ({documents.length})</h3>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
@@ -251,54 +290,48 @@ if(extracted.hraExemption!=null){
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-900/50">
-              {customFiles.map((file, idx) => (
-                <tr key={idx} className="text-slate-300 hover:bg-slate-900/10">
+              {documents.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="py-12 text-center text-slate-500"
+                >
+                  No documents uploaded yet.
+                </td>
+              </tr>
+            ) : 
+              documents.map((doc) => (
+                <tr key={doc._id} className="text-slate-300 hover:bg-slate-900/10">
                   <td className="py-4.5 pr-4 font-bold flex items-center space-x-2 text-emerald-400">
                     <FileCheck2 className="w-4 h-4 shrink-0" />
-                    <span className="truncate max-w-150px">{file.name}</span>
+                    <span className="truncate max-w-150px">{doc.originalFileName}</span>
                   </td>
-                  <td className="py-4.5 pr-4 font-medium">{file.type}</td>
-                  <td className="py-4.5 pr-4 text-slate-400">{file.date}</td>
-                  <td className="py-4.5 pr-4 text-slate-400">{file.size}</td>
+                  <td className="py-4.5 pr-4 font-medium">{formatDocumentType(doc)}</td>
+                  <td className="py-4.5 pr-4 text-slate-400">{formatVaultDate(doc)}</td>
+                  <td className="py-4.5 pr-4 text-slate-400">{formatVaultFileSize(doc)}</td>
                   <td className="py-4.5 pr-4">
                     <span className="px-2.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-400 uppercase tracking-wider">
-                      {file.status}
+                      {"Synced"}
                     </span>
                   </td>
                   <td className="py-4.5 text-right">
-                    <button 
-                      onClick={() => setCustomFiles(prev => prev.filter((_, i) => i !== idx))}
+
+
+
+
+
+                    {/* <button 
+                      onClick={() => deleteDocument(doc._id)}
                       className="p-1.5 rounded text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
-                    </button>
+                    </button> */}
                   </td>
                 </tr>
               ))}
-              {[
-                { name: "Form_16_FY_25-26.pdf", type: "Form 16", date: "June 1, 2026", size: "1.2 MB", status: "Synced" },
-                { name: "Rent_Receipts_Jan_Mar.pdf", type: "HRA Proof", date: "June 2, 2026", size: "2.4 MB", status: "Synced" },
-                { name: "Health_Premium_Receipt.pdf", type: "Section 80D", date: "June 3, 2026", size: "650 KB", status: "Synced" },
-                { name: "ELSS_Statement_Aditya.pdf", type: "Section 80C", date: "June 5, 2026", size: "920 KB", status: "Synced" },
-              ].map((file, idx) => (
-                <tr key={idx} className="text-slate-300 hover:bg-slate-900/10">
-                  <td className="py-4.5 pr-4 font-bold flex items-center space-x-2">
-                    <FileText className="w-4 h-4 shrink-0 text-slate-400" />
-                    <span className="truncate max-w-150px">{file.name}</span>
-                  </td>
-                  <td className="py-4.5 pr-4 font-medium">{file.type}</td>
-                  <td className="py-4.5 pr-4 text-slate-400">{file.date}</td>
-                  <td className="py-4.5 pr-4 text-slate-400">{file.size}</td>
-                  <td className="py-4.5 pr-4">
-                    <span className="px-2.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-400 uppercase tracking-wider">
-                      {file.status}
-                    </span>
-                  </td>
-                  <td className="py-4.5 text-right">
-                    <button className="p-1.5 rounded text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"><Trash2 className="w-4 h-4" /></button>
-                  </td>
-                </tr>
-              ))}
+              
+          
+              
             </tbody>
           </table>
         </div>

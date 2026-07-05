@@ -42,10 +42,16 @@ const documentSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.Mixed,
         default:{}
     },
+    fileSize:{
+        type:Number,
+        default:0
+    },
     uploadedAt: {
         type: Date,
         default: Date.now
     }
+}, {
+    timestamps: true
 });
 
 const Document = mongoose.model(
