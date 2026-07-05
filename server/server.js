@@ -33,6 +33,9 @@ app.use("/api/documents", documentRoutes);
 import verificationRoutes from "./routes/verificationRoutes.js";
 app.use("/api/verify", verificationRoutes);
 
+import chatRoutes from "./routes/chatRoutes.js";
+app.use("/api/chat", chatRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
