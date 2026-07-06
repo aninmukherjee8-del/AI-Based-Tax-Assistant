@@ -12,7 +12,17 @@ const taxProfileSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    salaryBreakdown: {
+        type: Map,
+        of: Number,
+        default: () => new Map()
+    },
 
+    epfBreakdown: {
+        type: Map,
+        of: Number,
+        default: () => new Map()
+    },
     income: {
       salary: {
         type: Number,

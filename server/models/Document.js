@@ -5,19 +5,19 @@ const documentSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        unique: true,
         required: true
     },
     documentType:{
         type:String,
         enum:[
             "form16",
-            "salarySlip",
-            "bankStatement",
-            "rentReceipt",
-            "insurance",
-            "investmentProof",
-            "loanCertificate",
+            "payslip",
+            "insurance_receipt",
+            "rent_receipt",
+            "elss_statement",
+            "nps_statement",
+            "bank_statement",
+            "investment_proof",
             "other"
         ]
     },
