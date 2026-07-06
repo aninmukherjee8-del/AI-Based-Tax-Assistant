@@ -74,9 +74,6 @@ export function updatePayslip(profile, extractedData) {
         profile.income.salary =
             sumMapValues(profile.salaryBreakdown);
     }
-
-    /* ---------------- 80C (EPF) ---------------- */
-
    /* ---------------- 80C (EPF) ---------------- */
 
     if (monthKey) {
