@@ -1,4 +1,3 @@
-import { generateRecommendations } from "./recommendationService.js";
 import TaxProfile from "../models/taxProfile.js";
 import { parseSalaryMonth } from "../utils/salaryMonthParser.js";
 
@@ -49,10 +48,16 @@ export async function findOrCreateProfile(userId) {
 export function updatePayslip(profile, extractedData) {
     const tax = extractedData.taxProfile || {};
     const documentData = extractedData.documentData || {};
+    console.log("Inside updatePayslip");
+    console.log(extractedData);
+    console.log("Salary Month:", documentData.salaryMonth);
+    console.log("Gross Income:", tax.grossIncome);
+    console.log("EPF:", documentData.epf);
+    
     const monthKey = parseSalaryMonth(
         documentData.salaryMonth
     );
-
+    console.log("Parsed Month:", monthKey);
     /* ---------------- Salary ---------------- */
 
     if (monthKey) {
@@ -64,13 +69,16 @@ export function updatePayslip(profile, extractedData) {
             monthKey,
             Math.max(currentSalary, newSalary)
         );
+        console.log(profile.salaryBreakdown);
+        console.log(profile.income.salary);
         profile.income.salary =
             sumMapValues(profile.salaryBreakdown);
     }
 
-    /* ---------------- 80C (EPF) ---------------- */
 
-     if (monthKey) {
+   /* ---------------- 80C (EPF) ---------------- */
+
+    if (monthKey) {
         const epfContribution = safeNumber(
             documentData.epf
         );
@@ -83,7 +91,6 @@ export function updatePayslip(profile, extractedData) {
         profile.deductions.section80C =
             sumMapValues(profile.epfBreakdown);
     }
-
     /* ---------------- HRA ---------------- */
 
     if (tax.hraExemption != null) {
@@ -239,31 +246,29 @@ export async function updateTaxProfile({
 }) {
     const profile =
         await findOrCreateProfile(userId);
-    switch(document.documentType){
-        case "payslip":
-            updatePayslip(profile, extractedData);
-            break;
-        case "form16":
-            updateForm16(profile, extractedData);
-            break;
-        case "bank_statement":
-            updateBankStatement(profile, extractedData);
-            break;
+        console.log("Document Type:", document.documentType);
+        switch(document.documentType){
+            case "payslip":
+                updatePayslip(profile, extractedData);
+                break;
+            case "form16":
+                updateForm16(profile, extractedData);
+                break;
+            case "bank_statement":
+                updateBankStatement(profile, extractedData);
+                break;
+        }
+        if(
+            !profile.documents.some(
+                id => id.equals(document._id)
+            )
+        ){
+            profile.documents.push(document._id);
+        }
+        profile.lastUpdatedFrom =
+            originalFileName;
+        profile.profileVersion++;
+        updateProfileCompletion(profile);
+        await profile.save();
+        return profile;
     }
-    if(
-        !profile.documents.some(
-            id => id.equals(document._id)
-        )
-    ){
-        profile.documents.push(document._id);
-    }
-    profile.lastUpdatedFrom =
-        originalFileName;
-    profile.profileVersion++;
-    updateProfileCompletion(profile);
-    await profile.save();
-
-    await generateRecommendations(profile);
-
-    return profile;
-}
