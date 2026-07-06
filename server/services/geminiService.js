@@ -23,11 +23,16 @@ export const extractDocument = async (filePath) => {
     }
 
    const content = [`
-You are a tax document parser.
+You are an expert AI tax document parser for Indian Income Tax.
 
-Identify the document type.
+Your task is to extract structured information from a tax-related document.
 
-Possible document types:
+----------------------------
+SUPPORTED DOCUMENT TYPES
+----------------------------
+
+Possible values for "documentType":
+
 - form16
 - payslip
 - insurance_receipt
@@ -38,9 +43,24 @@ Possible document types:
 - investment_proof
 - other
 
+----------------------------
+OUTPUT FORMAT
+----------------------------
+
 Return ONLY valid JSON.
 
-Use this exact schema:
+Do NOT use markdown.
+
+Do NOT use code fences.
+
+Do NOT explain anything.
+
+The first character MUST be {
+
+The last character MUST be }
+
+Return exactly this structure:
+
 {
   "documentType": "",
 
@@ -53,22 +73,176 @@ Use this exact schema:
     "tds": null
   },
 
-  "documentData": {},
+  "documentData": {
+
+  },
 
   "summary": ""
 }
 
-Rules:
-- Missing values must be null.
-- Monetary values must be numbers only.
-- Do not include currency symbols.
-- Do not include commas.
-- Return valid JSON only.
-- Do NOT wrap the response in markdown.
-- Do NOT use markdown code fences.
+----------------------------
+GENERAL RULES
+----------------------------
+
+- Missing values MUST be null.
+- Monetary values MUST be numbers only.
+- Never include ₹, commas or text.
+- Dates should remain exactly as written in the document unless specified otherwise.
+- Do not invent values.
+- If a field does not exist, return null.
 - Return raw JSON only.
-- The first character of the response must be {
-- The last character of the response must be }
+
+----------------------------
+DOCUMENT-SPECIFIC RULES
+----------------------------
+
+### 1. payslip
+
+Return documentData as:
+
+{
+  "employeeName": "",
+  "salaryMonth": "",
+  "salaryYear": null,
+  "dateOfJoining": "",
+  "employeeId": "",
+  "uanNo": "",
+  "esicNo": "",
+  "basicSalary": null,
+  "hra": null,
+  "allowances": null,
+  "overtime": null,
+  "bonus": null,
+  "grossSalary": null,
+  "epf": null,
+  "esic": null,
+  "professionalTax": null,
+  "loanDeduction": null,
+  "otherDeductions": null,
+  "totalDeductions": null,
+  "netSalary": null,
+  "paymentMethod": "",
+  "paymentDate": ""
+}
+
+IMPORTANT:
+
+Always return salaryMonth as "MONTH YEAR"
+
+Example:
+
+"AUGUST 2023"
+NOT
+month + year
+NOT
+08/2023
+NOT
+Aug-23
+NOT
+August-2023
+
+----------------------------
+
+### 2. form16
+
+Return:
+
+{
+  "employeeName":"",
+  "employerName":"",
+  "pan":"",
+  "tan":"",
+  "financialYear":"",
+  "assessmentYear":"",
+  "grossSalary":null,
+  "totalExemptions":null,
+  "totalDeductions":null,
+  "taxableIncome":null,
+  "totalTax":null,
+  "tdsDeducted":null
+}
+
+----------------------------
+
+### 3. insurance_receipt
+
+Return:
+
+{
+  "policyHolder":"",
+  "insurer":"",
+  "policyNumber":"",
+  "premiumPaid":null,
+  "policyType":"",
+  "paymentDate":""
+}
+
+----------------------------
+
+### 4. rent_receipt
+
+Return:
+
+{
+  "tenant":"",
+  "landlord":"",
+  "rentMonth":"",
+  "rentPaid":null,
+  "propertyAddress":""
+}
+
+----------------------------
+
+### 5. bank_statement
+
+Return:
+
+{
+  "bankName":"",
+  "accountNumber":"",
+  "statementPeriod":"",
+  "interestEarned":null
+}
+
+----------------------------
+
+### 6. investment_proof
+
+Return:
+
+{
+  "investmentType":"",
+  "investmentName":"",
+  "investmentAmount":null
+}
+
+----------------------------
+
+### 7. elss_statement
+
+Return:
+
+{
+  "fundName":"",
+  "investmentAmount":null,
+  "investmentDate":""
+}
+
+----------------------------
+
+### 8. nps_statement
+
+Return:
+
+{
+  "pran":"",
+  "contribution":null,
+  "financialYear":""
+}
+
+----------------------------
+
+The "summary" should contain a concise 2-3 sentence description of the document and the important tax-related information extracted.
 `
 
 ];

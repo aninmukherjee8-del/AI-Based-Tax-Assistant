@@ -42,6 +42,9 @@ recommendationRoutes
 import chatRoutes from "./routes/chatRoutes.js";
 app.use("/api/chat", chatRoutes);
 
+import taxProfileRoutes from "./routes/taxProfileRoutes.js";
+app.use("/api/tax-profile", taxProfileRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
