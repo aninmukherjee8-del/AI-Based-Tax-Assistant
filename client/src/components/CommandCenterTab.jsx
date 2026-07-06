@@ -213,58 +213,6 @@ export default function CommandCenterTab({
   const needleX = 50 + 32 * Math.cos(needleRad);
   const needleY = 50 - 32 * Math.sin(needleRad);
 
-  
-
-  // const triggerUploadSimulation = (profile) => {
-  //   setUploadState("scanning");
-  //   setScanProgress(0);
-  //   setScanStep(0);
-  //   setUploadedFile(profile.name);
-
-  //   const stepInterval = setInterval(() => {
-  //     setScanStep((prev) => (prev >= 3 ? 3 : prev + 1));
-  //   }, 1000);
-
-  //   const progressInterval = setInterval(() => {
-  //     setScanProgress((prev) => {
-  //       if (prev >= 100) {
-  //         clearInterval(progressInterval);
-  //         return 100;
-  //       }
-  //       return prev + 5;
-  //     });
-  //   }, 200);
-
-  //   setTimeout(() => {
-  //     clearInterval(stepInterval);
-  //     clearInterval(progressInterval);
-  //     setUploadState("complete");
-  //     setGrossIncome(profile.gross);
-  //     setDeduction80C(profile.c80);
-  //     setDeduction80D(profile.d80);
-  //     setDeductionNps(profile.nps);
-  //     setDeductionHra(profile.hra);
-  //     setProgress(95);
-
-  //     const newFile = {
-  //       name: profile.name,
-  //       type: profile.name.includes("Form_16") ? "Form 16" : "Salary Slip",
-  //       date: new Date().toLocaleDateString(),
-  //       size: profile.size,
-  //       status: "Parsed & Active"
-  //     };
-  //     setCustomFiles((prev) => [newFile, ...prev]);
-  //   }, 4000);
-  // };
-
-  // const resetUpload = () => {
-  //   setUploadState("idle");
-  //   setUploadedFile(null);
-  //   setScanProgress(0);
-  //   setScanStep(0);
-  //   setProgress(68);
-  // };
-
   const animatedIncome = useCountUp(grossIncome);
   const animatedTax = useCountUp(finalTax);
   const animatedDeductions = useCountUp(totalDeductions);
@@ -561,102 +509,9 @@ export default function CommandCenterTab({
               </div>
             </div>
           </div>
-
-          {/* Form 16 OCR Parser Simulator widget */}
-          {/* <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl relative overflow-hidden">
-            <h3 className="text-base font-bold text-white mb-1 flex items-center space-x-2">
-              <FileText className="w-5 h-5 text-emerald-400" />
-              <span>Form 16 OCR Parser Simulator</span>
-            </h3>
-            <p className="text-xs text-slate-400 mb-4">Simulate how TaxAssist AI extracts details directly from official tax documents.</p>
-
-            {uploadState === "idle" && (
-              <div className="border border-dashed border-slate-800 hover:border-emerald-500/40 rounded-2xl p-6 text-center bg-slate-950/40 transition-colors duration-300">
-                <UploadCloud className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                <p className="text-xs text-slate-300 font-semibold mb-1">Scan Document Profile</p>
-                <p className="text-[10px] text-slate-500 mb-4">Simulate parsing by clicking one of the sample PDF profiles below:</p>
-                
-                <div className="flex flex-col sm:flex-row justify-center items-center gap-2">
-                  {sampleProfiles.map((profile, i) => (
-                    <button
-                      key={i}
-                      onClick={() => triggerUploadSimulation(profile)}
-                      className="text-[10px] font-bold bg-slate-900 hover:bg-slate-800 border border-slate-850 hover:border-emerald-500/20 text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-xl transition-all cursor-pointer shadow-md"
-                    >
-                      Scan: {profile.name.slice(0, 15)}...
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {uploadState === "scanning" && (
-              <div className="border border-emerald-500/20 rounded-2xl p-6 bg-slate-950/80 relative overflow-hidden h-52 flex flex-col justify-between">
-                <div className="absolute left-0 w-full h-1 bg-linear-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_rgba(52,211,153,0.8)] animate-laser-scan pointer-events-none" />
-
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-2">
-                    <Activity className="w-4 h-4 text-emerald-400 animate-spin" />
-                    <span className="text-xs font-bold text-slate-200">Processing {uploadedFile}...</span>
-                  </div>
-                  <span className="text-xs font-mono font-bold text-emerald-400">{Math.round(scanProgress)}%</span>
-                </div>
-
-                <div className="grid grid-cols-1 gap-2 my-2 text-left">
-                  {[
-                    "Document Type Recognition & Alignment",
-                    "Parsing Section 17 W-2 Salary Schedules",
-                    "Extracting Section 80C/80D Deductions",
-                    "Auto-filling Command Center Dashboard"
-                  ].map((step, idx) => (
-                    <div key={idx} className="flex items-center text-[10px] font-semibold space-x-2">
-                      {scanStep > idx ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      ) : scanStep === idx ? (
-                        <span className="w-3.5 h-3.5 rounded-full border border-emerald-400/40 flex items-center justify-center"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" /></span>
-                      ) : (
-                        <span className="w-3.5 h-3.5 rounded-full border border-slate-800" />
-                      )}
-                      <span className={scanStep >= idx ? "text-slate-300 font-bold" : "text-slate-600"}>{step}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="w-full bg-slate-900 rounded-full h-1">
-                  <div 
-                    className="bg-emerald-400 h-1 rounded-full transition-all duration-200" 
-                    style={{ width: `${scanProgress}%`, boxShadow: "0 0 8px rgba(52,211,153,0.5)" }} 
-                  />
-                </div>
-              </div>
-            )}
-
-            {uploadState === "complete" && (
-              <div className="border border-emerald-500/30 bg-emerald-950/10 rounded-2xl p-6 text-center flex flex-col items-center justify-center space-y-3 shadow-[0_0_15px_rgba(16,185,129,0.05)]">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 animate-bounce">
-                  <FileCheck2 className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-extrabold text-emerald-400 uppercase tracking-widest">Parsing Successful</h4>
-                  <p className="text-[11px] text-slate-300 mt-1 max-w-sm">
-                    AI extracted all metrics from <strong>{uploadedFile}</strong> and updated your gross income and deductions accordingly.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={resetUpload}
-                    className="text-[10px] font-bold bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 px-3.5 py-1.5 rounded-lg transition-all cursor-pointer"
-                  >
-                    Scan Another File
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div> */}
-
+        </div>
         {/* Right Columns (AI Copilot suggestion drawer, risk levels) */}
-        {/* <div className="space-y-6"> */}
+        <div className="space-y-6"> 
           
           {/* AI Copilot Suggestions */}
           <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl flex flex-col items-center text-center relative overflow-hidden group">

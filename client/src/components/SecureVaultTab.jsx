@@ -38,30 +38,23 @@ export default function SecureVaultTab({
   const [vaultUploadedFile, setVaultUploadedFile] = useState(null);
 
   const fileInputRef = useRef(null);
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const fetchDocuments = async () => {
-  try {
-
-    setLoading(true);
-
-    const response = await api.get("/documents");
-
-    setDocuments(response.data.documents);
-
-  } catch (err) {
-
-    console.error(err);
-
-  } finally {
-
-    setLoading(false);
-
-  }
-};
+    try {
+      setLoading(true);
+      const response = await api.get("/documents");
+      setDocuments(response.data.documents);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-
     fetchDocuments();
-
 }, []);
 
   const handleVaultFileSelect = async (e) => {
@@ -115,6 +108,7 @@ export default function SecureVaultTab({
       } else {
         setVaultUploadState("complete");
       }
+      await fetchDocuments();
     }
     catch (err) {
       console.error(err);
@@ -285,44 +279,10 @@ export default function SecureVaultTab({
                     </span>
                   </td>
                   <td className="py-4.5 text-right">
-
-
-
-
-
-                    {/* <button 
-                      onClick={() => deleteDocument(doc._id)}
-                      className="p-1.5 rounded text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button> */}
                   </td>
                 </tr>
               ))}
-              {[
-                { name: "Form_16_FY_25-26.pdf", type: "Form 16", date: "June 1, 2026", size: "1.2 MB", status: "Synced" },
-                { name: "Rent_Receipts_Jan_Mar.pdf", type: "HRA Proof", date: "June 2, 2026", size: "2.4 MB", status: "Synced" },
-                { name: "Health_Premium_Receipt.pdf", type: "Section 80D", date: "June 3, 2026", size: "650 KB", status: "Synced" },
-                { name: "ELSS_Statement_Aditya.pdf", type: "Section 80C", date: "June 5, 2026", size: "920 KB", status: "Synced" },
-              ].map((file, idx) => (
-                <tr key={idx} className="text-slate-300 hover:bg-slate-900/10">
-                  <td className="py-4.5 pr-4 font-bold flex items-center space-x-2">
-                    <FileText className="w-4 h-4 shrink-0 text-slate-400" />
-                    <span className="truncate max-w-150px">{file.name}</span>
-                  </td>
-                  <td className="py-4.5 pr-4 font-medium">{file.type}</td>
-                  <td className="py-4.5 pr-4 text-slate-400">{file.date}</td>
-                  <td className="py-4.5 pr-4 text-slate-400">{file.size}</td>
-                  <td className="py-4.5 pr-4">
-                    <span className="px-2.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-400 uppercase tracking-wider">
-                      {file.status}
-                    </span>
-                  </td>
-                  <td className="py-4.5 text-right">
-                    <button className="p-1.5 rounded text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"><Trash2 className="w-4 h-4" /></button>
-                  </td>
-                </tr>
-              ))}
+              
             </tbody>
           </table>
         </div>
