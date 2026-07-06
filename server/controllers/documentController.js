@@ -6,6 +6,7 @@ import { generateFileHash } from "../utils/hashFile.js";
 import fs from "fs";
 
 export const parseDocument = async (req, res) => {
+    let filePath;
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -13,14 +14,29 @@ export const parseDocument = async (req, res) => {
                 message: "No file uploaded"
             });
         }
-        const filePath = req.file.path;
+        console.log("1. File received");
+        filePath = req.file.path;
+        console.log("2. Hashing");
         const fileHash = generateFileHash(filePath);
+        const userId = req.user.id;
+        const existingDocument =
+            await Document.findOne({
+                userId,
+                fileHash
+            });
 
+        if (existingDocument) {
+            return res.status(200).json({
+                success: true,
+                alreadyUploaded: true,
+                document: existingDocument
+            });
+        }
         // Existing PDF text extraction
         // const rawText = await extractText(filePath);
-        let rawResponse =
-        await extractDocument(filePath);
-
+        console.log("3. Calling Gemini");
+        let rawResponse =await extractDocument(filePath);
+        console.log("4. Gemini finished");
         console.log("RAW GEMINI RESPONSE:");
         console.log(rawResponse);
 
@@ -38,23 +54,7 @@ export const parseDocument = async (req, res) => {
         // })
         // Temporary userId for testing
         // Replace with req.user.id once auth is added
-        const userId = req.user.id;
-        const existingDocument =
-            await Document.findOne({
-                userId,
-                fileHash
-            });
-
-        if (existingDocument) {
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
-            }
-            return res.status(200).json({
-                success: true,
-                alreadyUploaded: true,
-                document: existingDocument
-            });
-        }
+        
         const cloudinaryResult = await uploadDocument(
             filePath,
             userId
@@ -74,10 +74,6 @@ export const parseDocument = async (req, res) => {
             extractedData: extractedText
         });
 
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
-
         res.status(200).json({
             success: true,
             text: extractedText,
@@ -88,14 +84,21 @@ export const parseDocument = async (req, res) => {
         });
 
     } catch (error) {
-
         console.error(error);
-
         res.status(500).json({
             success: false,
             message: "Failed to parse document"
         });
-
+    }
+    finally{
+        if (filePath && fs.existsSync(filePath)) {
+            try {
+                fs.unlinkSync(filePath);
+                console.log("Deleted:", filePath);
+            } catch (err) {
+                console.error("Delete failed:", err);
+            }
+        }
     }
 
         

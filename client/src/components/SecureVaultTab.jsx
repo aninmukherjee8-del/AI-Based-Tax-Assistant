@@ -29,215 +29,137 @@ export default function SecureVaultTab({
   setDeduction80D,
   setDeductionNps,
   setDeductionHra,
-  setActiveTab
+  customFiles,
+  setCustomFiles,
+  setActiveTab,
 }) {
   const [vaultUploadState, setVaultUploadState] = useState("idle");
+  // idle | uploading | complete | exists | error
   const [vaultUploadedFile, setVaultUploadedFile] = useState(null);
-  const [vaultScanProgress, setVaultScanProgress] = useState(0);
-  const [vaultScanStep, setVaultScanStep] = useState(0);
+
+  const fileInputRef = useRef(null);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef(null);
+
   const fetchDocuments = async () => {
-  try {
-
-    setLoading(true);
-
-    const response = await api.get("/documents");
-
-    setDocuments(response.data.documents);
-
-  } catch (err) {
-
-    console.error(err);
-
-  } finally {
-
-    setLoading(false);
-
-  }
-};
-
-  useEffect(() => {
-
-    fetchDocuments();
-
-}, []);
-
-  const triggerVaultUploadSimulation = (profile) => {
-    setVaultUploadState("scanning");
-    setVaultScanProgress(0);
-    setVaultScanStep(0);
-    setVaultUploadedFile(profile.name);
-
-    const stepInterval = setInterval(() => {
-      setVaultScanStep((prev) => (prev >= 3 ? 3 : prev + 1));
-    }, 850);
-
-    const progressInterval = setInterval(() => {
-      setVaultScanProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 50);
-
-    setTimeout(() => {
-      clearInterval(stepInterval);
-      clearInterval(progressInterval);
-      setVaultUploadState("complete");
-      setGrossIncome(profile.gross);
-      setDeduction80C(profile.c80);
-      setDeduction80D(profile.d80);
-      setDeductionNps(profile.nps);
-      setDeductionHra(profile.hra);
-
-    }, 3400);
+    try {
+      setLoading(true);
+      const response = await api.get("/documents");
+      setDocuments(response.data.documents);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleVaultFileSelect = async(e) => {
+  useEffect(() => {
+    fetchDocuments();
+}, []);
+
+  const handleVaultFileSelect = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const formData =
-    new FormData();
-
-    formData.append(
-      "document",
-      file
-    );
-    const response =
-    await api.post(
-    "/documents/parse",
-    formData,
-    {
-      headers:{
-        "Content-Type":
-        "multipart/form-data"
+    setVaultUploadedFile(file.name);
+    setVaultUploadState("uploading");
+    try{
+      const formData = new FormData();
+      formData.append("document", file);
+      const response = await api.post("/documents/parse", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(response.data);
+      const extracted =
+      response.data.text?.taxProfile ??
+      response.data.document?.extractedData?.taxProfile;
+      if (!extracted) {
+        console.error("No tax profile returned");
+        return;
       }
+      if(!response.data.alreadyUploaded){
+        const newFile = {
+            name: file.name,
+            type: response.data.text?.documentType ?? "Document",
+            date: new Date().toLocaleDateString(),
+            size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+            status: "Parsed & Active",
+        };
+        setCustomFiles(prev => [newFile, ...prev]);
+      }
+      if (extracted.grossIncome != null) {
+        setGrossIncome(extracted.grossIncome);
+      }
+      if (extracted.deduction80C != null) {
+        setDeduction80C(extracted.deduction80C);
+      }
+      if (extracted.deduction80D != null) {
+        setDeduction80D(extracted.deduction80D);
+      }
+      if (extracted.npsContribution != null) {
+        setDeductionNps(extracted.npsContribution);
+      }
+      if (extracted.hraExemption != null) {
+        setDeductionHra(extracted.hraExemption);
+      }
+      if (response.data.alreadyUploaded) {
+        setVaultUploadState("exists");
+      } else {
+        setVaultUploadState("complete");
+      }
+      await fetchDocuments();
     }
-    );
-
-    console.log(response.data);
-    const extracted =
-response.data.text?.taxProfile;
-
-if (!extracted) {
-   console.error(
-      "No tax profile returned"
-   );
-   return;
-}
-    
-    if(extracted.grossIncome!=null){
-   setGrossIncome(extracted.grossIncome);
-}
-
-if(extracted.deduction80C!=null){
-   setDeduction80C(extracted.deduction80C);
-}
-
-if(extracted.deduction80D!=null){
-   setDeduction80D(extracted.deduction80D);
-}
-
-if(extracted.npsContribution!=null){
-   setDeductionNps(extracted.npsContribution);
-}
-
-if(extracted.hraExemption!=null){
-   setDeductionHra(extracted.hraExemption);
-}
- await fetchDocuments();
-
-triggerVaultUploadSimulation({
-    name: file.name,
-    gross: extracted.grossIncome ?? 0,
-    c80: extracted.deduction80C ?? 0,
-    d80: extracted.deduction80D ?? 0,
-    nps: extracted.npsContribution ?? 0,
-    hra: extracted.hraExemption ?? 0,
-    size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
-});
-
-   
-    
+    catch (err) {
+      console.error(err);
+      setVaultUploadState("error");
+    }
+    finally {
+        e.target.value = "";
+    }
   };
 
   return (
     <div className="space-y-6 animate-bubble-fade-in text-xs">
-      
-      <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-lg font-bold text-white mb-1">Secure Documents Vault</h2>
-          <p className="text-xs text-slate-400">Encrypted files parsed with privacy-masking technology.</p>
-        </div>
-        <div className="flex items-center space-x-2 bg-slate-950/40 border border-slate-800/80 rounded-xl px-3.5 py-1.5 text-xs text-slate-300">
-          <Lock className="w-4 h-4 text-emerald-400" />
-          <span>256-bit AES Encryption</span>
-        </div>
-      </div>
-
       {/* Upload area with file trigger */}
       <div className="relative overflow-hidden">
-        <input 
-          type="file" 
+        <input
+          type="file"
           ref={fileInputRef}
           onChange={handleVaultFileSelect}
-          className="hidden" 
+          className="hidden"
         />
 
         {vaultUploadState === "idle" && (
-          <div 
+          <div
             onClick={() => fileInputRef.current.click()}
             className="border border-dashed border-slate-800 hover:border-emerald-500/20 rounded-3xl p-10 text-center bg-slate-900/30 backdrop-blur-md transition-colors group cursor-pointer"
           >
             <UploadCloud className="w-12 h-12 text-slate-500 mx-auto mb-3 group-hover:text-emerald-400 transition-colors duration-300" />
-            <h3 className="text-sm font-bold text-slate-200 mb-1 group-hover:text-white">Upload new documents to extract</h3>
-            <h5 className="text-xs text-slate-500 max-w-sm mx-auto mb-4">Click to select files. Upload Form 16, rent receipts, health premium bills, or investment statements.</h5>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1.5 border border-emerald-500/20 rounded-xl group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all">Select File</span>
+            <h3 className="text-sm font-bold text-slate-200 mb-1 group-hover:text-white">
+              Upload new documents to extract
+            </h3>
+            <h5 className="text-xs text-slate-500 max-w-sm mx-auto mb-4">
+              Click to select files. Upload Form 16, rent receipts, health
+              premium bills, or investment statements.
+            </h5>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3.5 py-1.5 border border-emerald-500/20 rounded-xl group-hover:bg-emerald-500 group-hover:text-slate-950 transition-all">
+              Select File
+            </span>
           </div>
         )}
 
-        {vaultUploadState === "scanning" && (
-          <div className="border border-emerald-500/20 bg-slate-950/90 rounded-3xl p-8 relative overflow-hidden h-56 flex flex-col justify-between backdrop-blur-xl">
-            <div className="absolute left-0 w-full h-1 bg-linear-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_rgba(52,211,153,0.8)] animate-laser-scan pointer-events-none" />
+        {vaultUploadState === "uploading" && (
+          <div className="border border-emerald-500/20 bg-slate-950/90 rounded-3xl p-10 flex flex-col items-center justify-center h-56">
+            <Activity className="w-10 h-10 text-emerald-400 animate-spin mb-4" />
 
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                <Activity className="w-4 h-4 text-emerald-400 animate-spin" />
-                <span className="text-xs font-bold text-slate-200">Scanning File: {vaultUploadedFile}...</span>
-              </div>
-              <span className="text-xs font-mono font-bold text-emerald-400">{Math.round(vaultScanProgress)}%</span>
-            </div>
+            <h3 className="text-white font-bold text-lg">
+              Processing Document...
+            </h3>
 
-            <div className="grid grid-cols-1 gap-2 my-2 text-left">
-              {[
-                "Uploading to Encrypted Vault Portal",
-                "Extracting Key Value Pairs & Deductions",
-                "Masking PII Sensitive Fields",
-                "Injecting Values to Tax Sliders"
-              ].map((step, idx) => (
-                <div key={idx} className="flex items-center text-[10px] font-semibold space-x-2">
-                  {vaultScanStep > idx ? (
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  ) : vaultScanStep === idx ? (
-                    <span className="w-3.5 h-3.5 rounded-full border border-emerald-400/40 flex items-center justify-center"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" /></span>
-                  ) : (
-                    <span className="w-3.5 h-3.5 rounded-full border border-slate-800" />
-                  )}
-                  <span className={vaultScanStep >= idx ? "text-slate-300 font-bold" : "text-slate-600"}>{step}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="w-full bg-slate-900 rounded-full h-1">
-              <div 
-                className="bg-emerald-400 h-1 rounded-full transition-all duration-200" 
-                style={{ width: `${vaultScanProgress}%`, boxShadow: "0 0 8px rgba(52,211,153,0.5)" }} 
-              />
-            </div>
+            <p className="text-slate-400 mt-2 text-center">
+              Uploading your document, extracting tax details and securely saving it.
+            </p>
           </div>
         )}
 
@@ -247,9 +169,12 @@ triggerVaultUploadSimulation({
               <FileCheck2 className="w-7 h-7" />
             </div>
             <div>
-              <h4 className="text-sm font-extrabold text-emerald-400 uppercase tracking-widest">Document Parsed and Saved</h4>
+              <h4 className="text-sm font-extrabold text-emerald-400 uppercase tracking-widest">
+                Document Parsed and Saved
+              </h4>
               <p className="text-xs text-slate-300 mt-1 max-w-sm mx-auto">
-                <strong>{vaultUploadedFile}</strong> has been encrypted, saved to vault, and scanned for tax optimization.
+                <strong>{vaultUploadedFile}</strong> has been encrypted, saved
+                to vault, and scanned for tax optimization.
               </p>
             </div>
             <div className="flex gap-2">
@@ -269,6 +194,45 @@ triggerVaultUploadSimulation({
                 Upload Another
               </button>
             </div>
+          </div>
+        )}
+        {vaultUploadState === "exists" && (
+          <div className="border border-yellow-500/20 bg-yellow-500/5 rounded-3xl p-10 text-center">
+            <FileCheck2 className="w-10 h-10 text-yellow-400 mx-auto mb-4" />
+
+            <h3 className="text-lg font-bold text-yellow-400">
+              Document Already Exists
+            </h3>
+
+            <p className="text-slate-300 mt-2">
+              <strong>{vaultUploadedFile}</strong> was already uploaded.
+              Existing extracted data has been loaded.
+            </p>
+
+            <button
+              onClick={() => setVaultUploadState("idle")}
+              className="mt-5 bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-xl"
+            >
+              Upload Another
+            </button>
+          </div>
+        )}
+        {vaultUploadState === "error" && (
+          <div className="border border-red-500/20 bg-red-500/5 rounded-3xl p-10 text-center">
+            <h3 className="text-red-400 font-bold text-lg">
+              Upload Failed
+            </h3>
+
+            <p className="text-slate-300 mt-2">
+              Something went wrong while processing your document.
+            </p>
+
+            <button
+              onClick={() => setVaultUploadState("idle")}
+              className="mt-5 bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-xl"
+            >
+              Try Again
+            </button>
           </div>
         )}
       </div>
@@ -315,22 +279,9 @@ triggerVaultUploadSimulation({
                     </span>
                   </td>
                   <td className="py-4.5 text-right">
-
-
-
-
-
-                    {/* <button 
-                      onClick={() => deleteDocument(doc._id)}
-                      className="p-1.5 rounded text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button> */}
                   </td>
                 </tr>
               ))}
-              
-          
               
             </tbody>
           </table>

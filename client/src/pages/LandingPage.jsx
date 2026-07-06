@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api.js";
 import InteractiveNetworkBackground from "../components/InteractiveNetworkBackground.jsx";
 // import MascotAssistant from "../components/MascotAssistant.jsx";
 import {
@@ -49,6 +51,27 @@ const useTypewriter = (text, delay = 0, speed = 50) => {
 };
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+    useEffect(() => {
+      const checkLogin = async () => {
+          const token = localStorage.getItem("token");
+          if (!token) return;
+          try {
+              await api.get("/users/profile", {
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                  },
+              });
+              navigate("/dashboard", { replace: true });
+          } catch (err) {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+          }
+      };
+
+      checkLogin();
+  }, []);
+
   const [income, setIncome] = useState(800000);
   const [deductions, setDeductions] = useState(150000);
 
