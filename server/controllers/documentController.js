@@ -3,6 +3,8 @@ import { uploadDocument } from "../services/cloudinaryService.js";
 import { extractDocument } from "../services/geminiService.js";
 import Document from "../models/Document.js";
 import { generateFileHash } from "../utils/hashFile.js";
+import { updateTaxProfile } from "../services/taxProfileService.js";
+import TaxProfile from "../models/taxProfile.js";
 import fs from "fs";
 
 export const parseDocument = async (req, res) => {
@@ -16,7 +18,6 @@ export const parseDocument = async (req, res) => {
         }
         console.log("1. File received");
         filePath = req.file.path;
-        console.log("2. Hashing");
         const fileHash = generateFileHash(filePath);
         const userId = req.user.id;
         const existingDocument =
@@ -34,11 +35,11 @@ export const parseDocument = async (req, res) => {
         }
         // Existing PDF text extraction
         // const rawText = await extractText(filePath);
-        console.log("3. Calling Gemini");
+        console.log("2. Calling Gemini");
         let rawResponse =await extractDocument(filePath);
-        console.log("4. Gemini finished");
-        console.log("RAW GEMINI RESPONSE:");
-        console.log(rawResponse);
+        console.log("3. Gemini finished");
+        // console.log("RAW GEMINI RESPONSE:");
+        // console.log(rawResponse);
 
         rawResponse = rawResponse
         .replace(/```json/g, "")
@@ -47,13 +48,6 @@ export const parseDocument = async (req, res) => {
 
         const extractedText =
         JSON.parse(rawResponse);
-        // console.log("Extracted Text");
-        // return res.status(200).json({
-        //     success: true,
-        //     text: extractedText,
-        // })
-        // Temporary userId for testing
-        // Replace with req.user.id once auth is added
         
         const cloudinaryResult = await uploadDocument(
             filePath,
@@ -63,15 +57,24 @@ export const parseDocument = async (req, res) => {
         const document =
         await Document.create({
             userId,
-            originalFileName:
-                req.file.originalname,
+            documentType: extractedText.documentType
+            ?.trim()
+            .toLowerCase()
+            .replace(/\s+/g, "_")
+            .replace(/-/g, "_"),
+            originalFileName: req.file.originalname,
             fileHash,
             fileSize: req.file.size,
-            cloudinaryUrl:
-                cloudinaryResult.secure_url,
-            cloudinaryPublicId:
-                cloudinaryResult.public_id,
+            cloudinaryUrl: cloudinaryResult.secure_url,
+            cloudinaryPublicId: cloudinaryResult.public_id,
             extractedData: extractedText
+        });
+
+        await updateTaxProfile({
+            userId,
+            document,
+            extractedData: extractedText,
+            originalFileName: req.file.originalname
         });
 
         res.status(200).json({
@@ -106,69 +109,24 @@ export const parseDocument = async (req, res) => {
 
 export const getUserDocuments = async (req, res) => {
     try {
-
         const documents = await Document.find({
             userId: req.user.id
         }).sort({ createdAt: -1 });
-
-        let grossIncome = 0;
-
-        let deduction80C = 0;
-        let deduction80D = 0;
-
-        let npsContribution = 0;
-        let hraExemption = 0;
-
-        let tds = 0;
-        documents.forEach((doc) => {
-            const tax = doc.extractedData?.taxProfile;
-
-                if (!tax) return;
-                grossIncome = Math.max(
-                grossIncome,
-                tax.grossIncome || 0);
-                deduction80C += tax.deduction80C || 0;
-
-                deduction80D += tax.deduction80D || 0;
-
-                npsContribution += tax.npsContribution || 0;
-
-                hraExemption += tax.hraExemption || 0;
-
-                tds += tax.tds || 0;
-
-});
-    res.status(200).json({
-    success: true,
-
-    documents,
-
-    dashboard: {
-
-        grossIncome,
-
-        deduction80C,
-
-        deduction80D,
-
-        npsContribution,
-
-        hraExemption,
-
-        tds
-
-    }
-
-});
+        const profile = await TaxProfile.findOne({
+            user: req.user.id,
+            financialYear: "2026-27"
+        });
+        res.status(200).json({
+            success: true,
+            documents,
+            taxProfile: profile
+        });
 
     } catch (error) {
-
         console.error(error);
-
         res.status(500).json({
             success: false,
             message: "Failed to fetch documents"
         });
-
     }
 };

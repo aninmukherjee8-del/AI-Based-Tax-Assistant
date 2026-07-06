@@ -33,6 +33,12 @@ app.use("/api/documents", documentRoutes);
 import verificationRoutes from "./routes/verificationRoutes.js";
 app.use("/api/verify", verificationRoutes);
 
+import recommendationRoutes from "./routes/recommendationRoutes.js";
+app.use(
+"/api/recommendations",
+recommendationRoutes
+);
+
 import chatRoutes from "./routes/chatRoutes.js";
 app.use("/api/chat", chatRoutes);
 
