@@ -3,15 +3,15 @@ import { generateRecommendations } from "../services/recommendationService.js";
 
 export const getTaxProfile = async (req, res) => {
   try {
-    let profile = await TaxProfile.findOne({
+    const profile = await TaxProfile.findOne({
       user: req.user.id,
       financialYear: "2026-27",
     }).populate("documents", "documentType originalFileName");
 
     if (!profile) {
-      profile = await TaxProfile.create({
-        user: req.user.id,
-        financialYear: "2026-27",
+      return res.status(404).json({
+        success: false,
+        message: "Tax profile not found",
       });
     }
 
