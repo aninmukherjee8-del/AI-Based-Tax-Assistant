@@ -38,8 +38,8 @@ export const parseDocument = async (req, res) => {
         console.log("2. Calling Gemini");
         let rawResponse =await extractDocument(filePath);
         console.log("3. Gemini finished");
-        // console.log("RAW GEMINI RESPONSE:");
-        // console.log(rawResponse);
+        console.log("RAW GEMINI RESPONSE:");
+        console.log(rawResponse);
 
         rawResponse = rawResponse
         .replace(/```json/g, "")

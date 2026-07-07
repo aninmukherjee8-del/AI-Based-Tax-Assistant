@@ -10,6 +10,7 @@ import {
   FileCheck2,
   Check
 } from "lucide-react";
+
 export default function RecommendationsTab({
   loadingRecs,
   recScanStep,
@@ -31,83 +32,115 @@ export default function RecommendationsTab({
     "Comparing Old vs. New tax regime advantages...",
     "Compiling tailored optimization summary..."
   ];
+
   return (
     <div className="space-y-6">
       
-      {/* Header Summary */}
-      <div className="flex justify-between items-center bg-slate-900/20 p-6 rounded-3xl border border-slate-900/40 backdrop-blur-md">
-        <div>
-          <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
-            AI Recommendations Engine
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Personalized, rule-based deductions analysis and regime optimization.
-          </p>
-        </div>
-        {recommendationData && !loadingRecs && (
-          <button
-            onClick={handleGiveRecommendation}
-            className="text-xs font-bold text-slate-300 hover:text-emerald-400 bg-slate-900/60 hover:bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Re-run Full Analysis</span>
-          </button>
-        )}
-      </div>
-      {/* Main Viewport */}
+      {/* Main Viewport Router */}
       {loadingRecs ? (
         /* LOADING STATE */
-        <div className="min-h-450px p-12 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <div className="min-h-112.5 p-6 md:p-12 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl flex flex-col relative overflow-hidden">
           <div className="absolute top-[-10%] left-[-10%] w-[35%] h-[35%] bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none" />
           
-          <div className="relative w-24 h-24 my-6 flex items-center justify-center">
-            <div className="absolute inset-0 border-4 border-slate-800/40 rounded-full" />
-            <div className="absolute inset-0 border-4 border-t-emerald-400 rounded-full animate-spin" />
-            <BrainCircuit className="w-10 h-10 text-emerald-400 animate-pulse" />
+          {/* Integrated Header */}
+          <div className="flex justify-between items-center w-full pb-6 border-b border-slate-800/40 text-left z-10">
+            <div>
+              <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
+                AI Recommendations Engine
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Personalized, rule-based deductions analysis and regime optimization.
+              </p>
+            </div>
           </div>
-          <h3 className="text-lg font-extrabold text-white tracking-wider uppercase">Running AI Core Calculations</h3>
-          <p className="text-xs text-emerald-400 font-mono mt-2.5 animate-pulse min-h-1.5rem">
-            {scanStepsList[recScanStep]}
-          </p>
-          <div className="w-full max-w-md bg-slate-950/65 rounded-full h-1.5 mt-8 border border-slate-800/80 overflow-hidden">
-            <div 
-              className="bg-emerald-400 h-full transition-all duration-300" 
-              style={{ width: `${((recScanStep + 1) / scanStepsList.length) * 100}%` }}
-            />
+          
+          {/* Main Body Content */}
+          <div className="flex-1 flex flex-col items-center justify-center text-center z-10 my-4">
+            <div className="relative w-24 h-24 my-6 flex items-center justify-center">
+              <div className="absolute inset-0 border-4 border-slate-800/40 rounded-full" />
+              <div className="absolute inset-0 border-4 border-t-emerald-400 rounded-full animate-spin" />
+              <BrainCircuit className="w-10 h-10 text-emerald-400 animate-pulse" />
+            </div>
+            <h3 className="text-lg font-extrabold text-white tracking-wider uppercase">Running AI Core Calculations</h3>
+            <p className="text-xs text-emerald-400 font-mono mt-2.5 animate-pulse min-h-6">
+              {scanStepsList[recScanStep]}
+            </p>
+            <div className="w-full max-w-md bg-slate-950/65 rounded-full h-1.5 mt-8 border border-slate-800/80 overflow-hidden">
+              <div 
+                className="bg-emerald-400 h-full transition-all duration-300" 
+                style={{ width: `${((recScanStep + 1) / scanStepsList.length) * 100}%` }}
+              />
+            </div>
           </div>
         </div>
       ) : !recommendationData ? (
         /* INITIAL STATE */
-        <div className="min-h-450px p-12 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <div className="min-h-112.5 p-6 md:p-12 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl flex flex-col relative overflow-hidden">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
           
-          <div className="relative w-28 h-28 my-6 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full bg-linear-to-tr from-emerald-500/25 via-green-500/5 to-transparent blur-md scale-110 opacity-70" />
-            <div className="w-20 h-20 rounded-full border border-emerald-500/30 flex items-center justify-center bg-slate-950/90 relative animate-float shadow-[0_0_30px_rgba(52,211,153,0.2)]">
-              <BrainCircuit className="w-10 h-10 text-emerald-400" />
+          {/* Integrated Header */}
+          <div className="flex justify-between items-center w-full pb-6 border-b border-slate-800/40 text-left z-10">
+            <div>
+              <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
+                AI Recommendations Engine
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Personalized, rule-based deductions analysis and regime optimization.
+              </p>
             </div>
           </div>
-          <h3 className="text-xl font-extrabold text-white tracking-tight">Generate Savings Report</h3>
-          <p className="text-xs text-slate-400 max-w-md mt-2 leading-relaxed">
-            Run our tax calculation algorithms to scan your profiles, recognize qualified investment deductions, check missing files, and maximize your savings.
-          </p>
-          {recsError && (
-            <div className="mt-4 px-4 py-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
-              <p className="text-xs text-rose-400 font-semibold">{recsError}</p>
+          
+          {/* Main Body Content */}
+          <div className="flex-1 flex flex-col items-center justify-center text-center z-10 my-4">
+            <div className="relative w-28 h-28 my-6 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-linear-to-tr from-emerald-500/25 via-green-500/5 to-transparent blur-md scale-110 opacity-70" />
+              <div className="w-20 h-20 rounded-full border border-emerald-500/30 flex items-center justify-center bg-slate-950/90 relative animate-float shadow-[0_0_30px_rgba(52,211,153,0.2)]">
+                <BrainCircuit className="w-10 h-10 text-emerald-400" />
+              </div>
             </div>
-          )}
-          <button
-            onClick={handleGiveRecommendation}
-            className="mt-8 py-3.5 px-8 font-extrabold text-xs bg-linear-to-tr from-emerald-600 to-green-400 hover:from-emerald-500 hover:to-green-300 text-slate-950 rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/20 hover:scale-105 cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2"
-          >
-            <Sparkles className="w-4.5 h-4.5 text-slate-950" />
-            Give Recommendation
-          </button>
+            <h3 className="text-xl font-extrabold text-white tracking-tight">Generate Savings Report</h3>
+            <p className="text-xs text-slate-400 max-w-md mt-2 leading-relaxed">
+              Run our tax calculation algorithms to scan your profiles, recognize qualified investment deductions, check missing files, and maximize your savings.
+            </p>
+            {recsError && (
+              <div className="mt-4 px-4 py-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+                <p className="text-xs text-rose-400 font-semibold">{recsError}</p>
+              </div>
+            )}
+            <button
+              onClick={handleGiveRecommendation}
+              className="mt-8 py-3.5 px-8 font-extrabold text-xs bg-linear-to-tr from-emerald-600 to-green-400 hover:from-emerald-500 hover:to-green-300 text-slate-950 rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/20 hover:scale-105 cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2"
+            >
+              <Sparkles className="w-4.5 h-4.5 text-slate-950" />
+              Give Recommendation
+            </button>
+          </div>
         </div>
       ) : (
         /* RESULTS STATE */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-left">
+          
+          {/* Integrated Header - Spans Full Width Across Grid */}
+          <div className="lg:col-span-3 flex justify-between items-center pb-4 border-b border-slate-800/60 w-full mb-2">
+            <div>
+              <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
+                AI Recommendations Engine
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Personalized, rule-based deductions analysis and regime optimization.
+              </p>
+            </div>
+            <button
+              onClick={handleGiveRecommendation}
+              className="text-xs font-bold text-slate-300 hover:text-emerald-400 bg-slate-900/60 hover:bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Re-run Full Analysis</span>
+            </button>
+          </div>
           
           {/* Left Panel: Regime Recommendation and Est. Saving */}
           <div className="lg:col-span-1 space-y-6">
@@ -133,6 +166,7 @@ export default function RecommendationsTab({
                 )}
               </div>
             </div>
+
             {/* Quick Summary list */}
             <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl space-y-4">
               <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider pb-2 border-b border-slate-900/60">Profile Status</h4>
@@ -152,6 +186,7 @@ export default function RecommendationsTab({
               </div>
             </div>
           </div>
+
           {/* Right Panel: Optimization suggestions lists */}
           <div className="lg:col-span-2 space-y-6">
             
@@ -200,6 +235,7 @@ export default function RecommendationsTab({
                   )}
                 </div>
               </div>
+
               {/* Government Schemes Eligibility */}
               <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl space-y-4 flex flex-col justify-between">
                 <div>
@@ -232,6 +268,7 @@ export default function RecommendationsTab({
                 </div>
               </div>
             </div>
+
             {/* Warnings and Missing Documents */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
@@ -251,6 +288,7 @@ export default function RecommendationsTab({
                   <p className="text-xs text-slate-500 mt-2">No warnings detected.</p>
                 )}
               </div>
+
               {/* Missing Documents */}
               <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xl space-y-4">
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider pb-2 border-b border-slate-900/60">Missing Documents</h4>
@@ -270,6 +308,7 @@ export default function RecommendationsTab({
                   <p className="text-xs text-slate-500 mt-2">No missing documents flagged.</p>
                 )}
               </div>
+
             </div>
           </div>
         </div>
