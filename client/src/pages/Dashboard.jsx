@@ -450,7 +450,7 @@ export default function EnhancedDashboard() {
               </div>
               <div className="overflow-hidden">
                 <p className="text-xs font-bold text-slate-200 truncate">{profileName}</p>
-                <p className="text-[10px] text-emerald-400/80 font-medium">Pro AI Filer</p>
+                <p className="text-[10px] text-emerald-400/80 font-medium">Verified Taxpayer</p>
               </div>
             </div>
           </div>

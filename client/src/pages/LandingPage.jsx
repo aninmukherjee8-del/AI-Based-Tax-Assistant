@@ -354,37 +354,37 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature Cards Matrix */}
             {[
-              {
-                icon: FileText,
-                title: "Intelligent Document Parsing",
-                desc: "Upload your financial PDF reports, Form 16, or salary slips. Our privacy-aware OCR extract financial figures instantly, minimizing manual entry errors.",
-              },
-              {
-                icon: MessageSquare,
-                title: "Interactive AI Chat Support",
-                desc: "Confused by specific clauses? Chat in real-time with an AI assistant that answers your queries in clear terms rather than complex tax jargon.",
-              },
-              {
-                icon: TrendingUp,
-                title: "Smart Tax Savings Guidance",
-                desc: "Scan eligible deductions and government savings programs based on your spending. Never miss out on legal exemptions you qualify for.",
-              },
-              {
-                icon: Calculator,
-                title: "Guided Step-By-Step Filing",
-                desc: "A simple workflow guiding you through the full filing process. Input information segment-by-segment and track your overall completion status.",
-              },
-              {
-                icon: Shield,
-                title: "Privacy-Aware Design",
-                desc: "Your financial data is encrypted and parsed safely. Sensitive entries are filtered out to guarantee maximum confidentiality at all times.",
-              },
-              {
-                icon: BookOpen,
-                title: "Transparent & Explainable",
-                desc: "No black-box answers. Whenever our AI suggests a path, we cite the official tax rules or codes so you can verify the details yourself.",
-              },
-            ].map((feat, idx) => {
+  {
+    icon: FileText,
+    title: "AI Document Intelligence",
+    desc: "Upload Form 16, salary slips, insurance receipts, bank statements, and investment proofs. AI automatically extracts tax-related information and builds your financial profile.",
+  },
+  {
+    icon: MessageSquare,
+    title: "Personal AI Tax Assistant",
+    desc: "Ask tax-related questions in natural language and receive personalized answers based on your uploaded documents, deductions, and financial profile.",
+  },
+  {
+    icon: TrendingUp,
+    title: "AI Tax Optimization",
+    desc: "Receive intelligent tax-saving recommendations, deduction opportunities, regime comparisons, and personalized strategies to legally minimize your tax liability.",
+  },
+  {
+    icon: Shield,
+    title: "Secure Document Vault",
+    desc: "All uploaded tax documents are securely stored and encrypted. Access your financial records anytime while maintaining complete privacy and confidentiality.",
+  },
+  {
+    icon: Sparkles,
+    title: "Personalized Tax Insights",
+    desc: "Generate AI-powered tax reports highlighting eligible deductions, missing documents, estimated tax savings, and government schemes tailored to your profile.",
+  },
+  {
+    icon: Cpu,
+    title: "Real-Time Tax Profile",
+    desc: "Your financial profile is automatically updated as new documents are uploaded, giving you a live overview of income, deductions, taxes paid, and investments.",
+  },
+].map((feat, idx) => {
               const IconComponent = feat.icon;
               return (
                 <div

@@ -1,5 +1,6 @@
 import TaxProfile from "../models/taxProfile.js";
 import { parseSalaryMonth } from "../utils/salaryMonthParser.js";
+import { generateRecommendations } from "./recommendationService.js";
 
 const FINANCIAL_YEAR = "2026-27";
 
@@ -267,6 +268,14 @@ export async function updateTaxProfile({
             originalFileName;
         profile.profileVersion++;
         updateProfileCompletion(profile);
+
         await profile.save();
+
+        console.log("Profile saved");
+
+        await generateRecommendations(profile);
+
+        console.log("Recommendations generated");
+
         return profile;
     }

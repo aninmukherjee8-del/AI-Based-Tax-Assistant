@@ -3,7 +3,7 @@ import Recommendation from "../models/Recommendation.js";
 console.log("Generating AI recommendations...");
 
 export const generateRecommendations = async(profile)=>{
-
+console.log("===== ENTERED generateRecommendations =====");
     try{
 
         const profileData={
@@ -112,7 +112,7 @@ Use this schema:
         JSON.parse(text);
 
         await Recommendation.findOneAndUpdate(
-
+            
             {
 
                 user:profile.user
@@ -136,6 +136,11 @@ Use this schema:
             }
 
         );
+        console.log("Gemini returned:");
+
+        console.log(recommendation);
+
+        console.log("Saving recommendation...");
 
         return recommendation;
 

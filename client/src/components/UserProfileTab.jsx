@@ -176,7 +176,7 @@ export default function UserProfileTab({
           <div>
             <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight">{profileName}</h3>
             <p className="text-[10px] md:text-xs text-emerald-400 font-bold uppercase tracking-wider mt-1 bg-emerald-500/10 inline-block px-2 py-0.5 rounded-md border border-emerald-500/20">
-              Pro AI Tax Filer
+              Verified Taypayer
             </p>
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function UserProfileTab({
               )}
             </div>
           </div>
-
+{/* 
           <div className="flex flex-col gap-2 bg-slate-950/50 p-3 md:px-4 md:py-3 rounded-2xl border border-slate-800/50 min-w-35">
             <div className="flex justify-between items-center gap-4">
               <span className="text-slate-400 flex items-center gap-1.5"><Wallet className="w-3.5 h-3.5" /> Est. Savings</span>
@@ -210,7 +210,7 @@ export default function UserProfileTab({
               <span className="text-slate-400 flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Vault Files</span>
               <span className="text-slate-200 font-bold font-mono">{4 + customFiles.length}</span>
             </div>
-          </div>
+          </div> */}
 
           <button
             type="button"
