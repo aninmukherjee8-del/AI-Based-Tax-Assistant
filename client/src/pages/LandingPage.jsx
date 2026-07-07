@@ -122,7 +122,7 @@ export default function LandingPage() {
               <span className="text-xl font-extrabold tracking-tight bg-linear-to-r from-white via-slate-200 to-emerald-400 bg-clip-text text-transparent">
                 Tax
                 <span className="text-emerald-400 font-semibold group-hover:text-green-300 transition-colors duration-300">
-                  Assist.AI
+                  Wise
                 </span>
               </span>
             </div>

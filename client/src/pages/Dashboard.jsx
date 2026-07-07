@@ -166,7 +166,7 @@ export default function EnhancedDashboard() {
               <Cpu className="w-5 h-5 text-slate-950" />
             </div>
             <span className="ml-3 text-lg font-extrabold tracking-tight bg-linear-to-r from-white to-emerald-400 bg-clip-text text-transparent">
-              Tax<span className="text-emerald-400 font-semibold">Assist.AI</span>
+              Tax<span className="text-emerald-400 font-semibold">Wise</span>
             </span>
           </div>
 

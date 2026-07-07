@@ -1,18 +1,20 @@
 import TaxProfile from "../models/taxProfile.js";
+import { generateRecommendations } from "../services/recommendationService.js";
 
 export const getTaxProfile = async (req, res) => {
   try {
-    const profile = await TaxProfile.findOne({
+    let profile = await TaxProfile.findOne({
       user: req.user.id,
       financialYear: "2026-27",
     }).populate("documents", "documentType originalFileName");
+
     if (!profile) {
-      return res.status(404).json({
-        success: false,
-        profile: null,
-        message: "Tax profile not found",
+      profile = await TaxProfile.create({
+        user: req.user.id,
+        financialYear: "2026-27",
       });
     }
+
     return res.status(200).json({
       success: true,
       profile,
@@ -28,16 +30,18 @@ export const getTaxProfile = async (req, res) => {
 
 export const updateTaxProfile = async (req, res) => {
   try {
-    const profile = await TaxProfile.findOne({
+    let profile = await TaxProfile.findOne({
       user: req.user.id,
       financialYear: "2026-27",
     });
+
     if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: "Tax profile not found",
+      profile = await TaxProfile.create({
+        user: req.user.id,
+        financialYear: "2026-27",
       });
     }
+
     Object.assign(profile.income, req.body.income || {});
     Object.assign(profile.deductions, req.body.deductions || {});
     Object.assign(profile.taxes, req.body.taxes || {});
@@ -45,6 +49,9 @@ export const updateTaxProfile = async (req, res) => {
     Object.assign(profile.expenses, req.body.expenses || {});
 
     profile.profileVersion++;
+
+    await profile.save();
+    await generateRecommendations(profile);
 
     await profile.save();
 

@@ -192,14 +192,14 @@ export default function AuthPage() {
             </svg>
           </div>
           <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '20px', color: '#f8fafc', letterSpacing: '-0.01em' }}>
-            TaxAssist<span style={{ color: '#34d399' }}>.AI</span>
+            Tax<span style={{ color: '#34d399' }}>Wise</span>
           </span>
         </div>
 
         {/* Heading */}
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <h1 style={{
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: " sans-serif",
             fontWeight: 800,
             fontSize: '28px',
             color: '#f8fafc',
