@@ -1092,7 +1092,7 @@ export default function CommandCenterTab({
             }`}>
               {betterRegime === "OLD" && (
                 <div className="absolute -top-3 right-6 bg-emerald-500 text-slate-950 font-black text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md shadow-md">
-                  AI Recommended
+                   Recommended
                 </div>
               )}
               <div>
@@ -1132,7 +1132,7 @@ export default function CommandCenterTab({
             }`}>
               {betterRegime === "NEW" && (
                 <div className="absolute -top-3 right-6 bg-emerald-500 text-slate-950 font-black text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md shadow-md">
-                  AI Recommended
+                  Recommended
                 </div>
               )}
               <div>
@@ -1187,12 +1187,11 @@ export default function CommandCenterTab({
             </div>
 
             <p className="text-[11px] text-slate-400 leading-relaxed mb-6 px-2">
-              Optimize your tax exemptions, scan for missing papers, explore government plans, and compare tax regimes.
-            </p>
+Optimize taxes with AI insights.            </p>
 
             <button
               onClick={() => setActiveTab("recommendations")}
-              className="w-full py-3 px-4 font-bold text-xs bg-linear-to-tr from-emerald-500 to-green-400 hover:from-emerald-400 hover:to-green-300 text-slate-950 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-emerald-500/20 transform hover:-translate-y-0.5 cursor-pointer uppercase tracking-wider flex items-center justify-center gap-2"
+              className="w-full py-1 px-4 font-bold text-xs bg-linear-to-tr from-emerald-500 to-green-400 hover:from-emerald-400 hover:to-green-300 text-slate-950 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-emerald-500/20 transform hover:-translate-y-0.5 cursor-pointer uppercase tracking-wider flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4.5 h-4.5 text-slate-950" />
               View AI Recommendations

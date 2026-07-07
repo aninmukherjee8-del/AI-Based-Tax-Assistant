@@ -10,6 +10,7 @@ export const getRecommendations=async(req,res)=>{
             user:req.user.id
 
         });
+        console.log("Recommendation from DB:", recommendation);
 
         res.status(200).json({
 
