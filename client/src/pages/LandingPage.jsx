@@ -15,6 +15,7 @@ import {
   BookOpen,
   Cpu,
   Lock,
+  LayoutDashboard,
   CheckCircle2,
   HelpCircle,
 } from "lucide-react";
@@ -359,10 +360,10 @@ export default function LandingPage() {
     title: "AI Document Intelligence",
     desc: "Upload Form 16, salary slips, insurance receipts, bank statements, and investment proofs. AI automatically extracts tax-related information and builds your financial profile.",
   },
-  {
-    icon: MessageSquare,
-    title: "Personal AI Tax Assistant",
-    desc: "Ask tax-related questions in natural language and receive personalized answers based on your uploaded documents, deductions, and financial profile.",
+    {
+    icon: LayoutDashboard,
+    title: "Intelligent Command Centre",
+    desc: "Monitor your complete tax profile from a unified dashboard with real-time insights into income, deductions, investments, taxes paid, audit risk, and profile completion."
   },
   {
     icon: TrendingUp,
